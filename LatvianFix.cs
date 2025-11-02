@@ -3,6 +3,8 @@ using System.Reflection;
 using HarmonyLib;
 using UnityEngine;
 
+// Work in Progress
+
 namespace OfficialPuckMod
 {
     // Defensive replacement for Puck.OnCollisionEnter for Goal Net / Goal Post collisions.

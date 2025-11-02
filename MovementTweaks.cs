@@ -19,16 +19,19 @@ namespace OfficialPuckMod
         public static float MaxBackwardsSprintSpeedMultiplier = 1.05f;
         public static float BackwardsAccelerationMultiplier = 1.5f;
         public static float BackwardsSprintAccelerationMultiplier = 1.5f;
+
         // Additional movement multipliers
         public static float TurnBrakeAccelerationMultiplier = 2.3f;
         public static float TurnDragMultiplier = 1.0f;
+
         // VelocityLean multiplier for angular force
         public static float VelocityLeanAngularForceMultiplier = 0.87f;
-    // PlayerBodyV2 multipliers for balance timings
-    // balanceRecoveryTime: how long it takes to recover balance after a fall (higher = slower recovery)
-    public static float BalanceRecoveryTimeMultiplier = 0.3f;
-    // balanceLossTime: how long it takes to lose balance when slipping (higher = slower loss)
-    public static float BalanceLossTimeMultiplier = 0.3f;
+
+        // PlayerBodyV2 multipliers for balance timings
+        // balanceRecoveryTime: how long it takes to recover balance after a fall (higher = slower recovery)
+        public static float BalanceRecoveryTimeMultiplier = 0.3f;
+        // balanceLossTime: how long it takes to lose balance when slipping (higher = slower loss)
+        public static float BalanceLossTimeMultiplier = 0.3f;
 
         // Keep originals per-instance so we don't compound multipliers
         class OriginalValues
