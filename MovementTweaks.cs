@@ -14,8 +14,8 @@ namespace OfficialPuckMod
 
         // Multipliers (default 1.0 = no change). Set at runtime to tweak behaviour.
         public static float TurnAccelerationMultiplier = 1.18f;
-        public static float TurnMaxSpeedMultiplier = 1.07f;
-        public static float MaxBackwardsSpeedMultiplier = 1.05f;
+        public static float TurnMaxSpeedMultiplier = 1.0764f;
+        public static float MaxBackwardsSpeedMultiplier = 1.035f;
         public static float MaxBackwardsSprintSpeedMultiplier = 1.05f;
         public static float BackwardsAccelerationMultiplier = 1.5f;
         public static float BackwardsSprintAccelerationMultiplier = 1.5f;
