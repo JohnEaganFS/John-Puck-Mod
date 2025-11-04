@@ -35,7 +35,8 @@ namespace OfficialPuckMod
                               "Stick Speed: 1200\n" +
                               "Puck-Body Collision: Disabled\n" +
                               "Blade on Blade Only\n" +
-                              "PHL Turning Values\n";
+                              "PHL Turning Values\n" +
+                              "Faceoff Puck Spawns on Ice\n";
 
                 // Try to get the private 'uiChat' field from the UIChatController instance via reflection
                 UIChat uiChat = null;
