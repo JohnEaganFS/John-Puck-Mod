@@ -20,6 +20,8 @@ namespace OfficialPuckMod
 
                 // Ensure ValueTweaks (puck/goal scaling) is initialized as well
                 try { ValueTweaksHelpers.Init(); } catch (Exception e) { Debug.LogException(e); }
+                // Ensure FaceoffTweaks is initialized when this assembly's single IPuckMod is loaded
+                try { FaceoffTweaksHelpers.Init(); } catch (Exception e) { Debug.LogException(e); }
 
                 // Apply rules immediately to existing objects if we're the server
                 if (NetworkManager.Singleton != null && NetworkManager.Singleton.IsServer)
@@ -43,6 +45,7 @@ namespace OfficialPuckMod
                 DisableCollisionHelpers.UnregisterEventListeners();
                 DisableCollisionHelpers.Shutdown();
                 try { ValueTweaksHelpers.Shutdown(); } catch (Exception e) { Debug.LogException(e); }
+                try { FaceoffTweaksHelpers.Shutdown(); } catch (Exception e) { Debug.LogException(e); }
             }
             catch (Exception e)
             {
