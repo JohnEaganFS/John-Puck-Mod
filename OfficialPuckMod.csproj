@@ -33,6 +33,7 @@
   <Target Name="PostBuildMoveDll" AfterTargets="Build">
     <PropertyGroup>
       <TargetDir>J:\Steam\steamapps\common\Puck\Plugins\John's Puck Mod</TargetDir>
+      <WorkshopUnstableDir>J:\Downloads\SteamWorkshopUploader\WorkshopContent\John's Official Puck Mod - Unstable</WorkshopUnstableDir>
       <WorkshopDir>J:\Downloads\SteamWorkshopUploader\WorkshopContent\John's Official Puck Mod</WorkshopDir>
     </PropertyGroup>
 
@@ -40,8 +41,9 @@
     <MakeDir Directories="$(WorkshopDir)" />
     <Copy SourceFiles="$(OutputPath)$(AssemblyName).dll" DestinationFolder="$(TargetDir)" OverwriteReadOnlyFiles="true" />
     <Copy SourceFiles="$(OutputPath)$(AssemblyName).dll" DestinationFolder="$(WorkshopDir)" OverwriteReadOnlyFiles="true" />
-    
-    <Message Importance="high" Text="Copied $(AssemblyName).dll to $(TargetDir) and $(WorkshopDir)" />
+    <Copy SourceFiles="$(OutputPath)$(AssemblyName).dll" DestinationFolder="$(WorkshopUnstableDir)" OverwriteReadOnlyFiles="true" />
+
+    <Message Importance="high" Text="Copied $(AssemblyName).dll to $(TargetDir), $(WorkshopDir), and $(WorkshopUnstableDir)" />
   </Target>
 
 </Project>

@@ -28,7 +28,7 @@ namespace OfficialPuckMod
 
         internal static void ApplyScaleToGoal(Goal goal)
         {
-            try
+            try // catch all to avoid breaking goal spawn
             {
                 if (goal == null) return;
                 if (Math.Abs(GoalTriggerScale - 1.0f) < 0.000001f) return; // no-op
