@@ -45,6 +45,8 @@ namespace OfficialPuckMod
 
     // Configurable puck scale (1.0 = default). Change this to make pucks bigger/smaller.
     public static float PuckScale = 0.92f;
+    // Configurable puck maximum linear speed (units/sec). Set to 0 or negative to disable clamping.
+    public static float PuckMaxSpeed = 50f;
 
         public static void Init()
         {
@@ -93,6 +95,29 @@ namespace OfficialPuckMod
 
                 // If the puck has a serialized netSphereCollider, we may wish to adjust its base radius if needed.
                 // The collider's radius is in local space so scaling the transform is generally sufficient.
+            }
+            catch (Exception e)
+            {
+                try { Debug.LogException(e); } catch { }
+            }
+        }
+    }
+
+    // Override the serialized private `maxSpeed` field on Puck instances when they awake.
+    [HarmonyPatch(typeof(Puck), "Awake")]
+    static class Puck_OverrideSerializedMaxSpeed_Patch
+    {
+        static void Postfix(Puck __instance)
+        {
+            try
+            {
+                if (__instance == null) return;
+                if (ValueTweaksHelpers.PuckMaxSpeed <= 0f) return;
+                var fi = typeof(Puck).GetField("maxSpeed", BindingFlags.Instance | BindingFlags.NonPublic);
+                if (fi != null)
+                {
+                    fi.SetValue(__instance, ValueTweaksHelpers.PuckMaxSpeed);
+                }
             }
             catch (Exception e)
             {
