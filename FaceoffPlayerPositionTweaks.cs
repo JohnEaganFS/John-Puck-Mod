@@ -63,11 +63,11 @@ namespace OfficialPuckMod
         public static bool Enabled = true;
 
         // If true, use a fixed override position instead of adjusting based on the scene PlayerPosition
-        public static bool UsePlayerCenterOverridePosition = false;
-        public static Vector3 PlayerCenterOverridePosition = new Vector3(5f, 5f, 0f);
+        public static bool UsePlayerCenterOverridePosition = true;
+        public static Vector3 PlayerCenterOverridePosition = new Vector3(0f, 0f, 5f);
 
         // Offsets applied relative to the found PlayerPosition transform (forward/right) or to the override
-        public static float PlayerCenterForwardOffset = 5f;
+        public static float PlayerCenterForwardOffset = 0f;
         public static float PlayerCenterSideOffset = 0f;
         public static float PlayerCenterVerticalOffset = 0f;
 
@@ -180,7 +180,17 @@ namespace OfficialPuckMod
 
                         if (UsePlayerCenterOverridePosition)
                         {
-                            target = PlayerCenterOverridePosition;
+                            // Mirror the override baseline for Red/Blue teams so the override behaves like a per-team baseline.
+                            try
+                            {
+                                float sign = 1f;
+                                try { if (centerPos.Team == PlayerTeam.Red) sign = -1f; } catch { }
+                                target = new Vector3(PlayerCenterOverridePosition.x * sign, PlayerCenterOverridePosition.y, PlayerCenterOverridePosition.z * sign);
+                            }
+                            catch
+                            {
+                                target = PlayerCenterOverridePosition;
+                            }
                         }
                         else
                         {
@@ -200,30 +210,17 @@ namespace OfficialPuckMod
                         try
                         {
                             float sign = 1f;
-                            bool isBlueCenter = !string.IsNullOrEmpty(centerPos.Name) && centerPos.Name.Trim().Equals("Blue", StringComparison.OrdinalIgnoreCase);
-                            if (isBlueCenter)
+                            try
                             {
-                                sign = 1f;
-                                Debug.Log("[FaceoffPlayerPositionTweaks] Mirroring offsets for Blue team.");
+                                // Use the Team enum to determine mirroring. Blue = +1, Red = -1.
+                                if (centerPos.Team == PlayerTeam.Red) sign = -1f;
+                                else sign = 1f;
+                                Debug.Log(string.Format("[FaceoffPlayerPositionTweaks] Mirroring offsets for Team={0} sign={1}", centerPos.Team.ToString(), sign));
                             }
-                            else
-                            {
-                                sign = -1f;
-                                Debug.Log("[FaceoffPlayerPositionTweaks] Mirroring offsets for Red team.");
-                            }
-                            // try { if (centerPos.Team == PlayerTeam.Red) sign = -1f; Debug.Log("[FaceoffPlayerPositionTweaks] Mirroring offsets for Red team."); } catch { }
+                            catch { /* Team not available or unknown - default sign=1 */ }
 
-                            if (isCenterName)
-                            {
-                                target += centerPos.transform.forward * PlayerCenterForwardOffset * sign;
-                                target += centerPos.transform.right * PlayerCenterSideOffset * sign;
-                            }
-                            else
-                            {
-                                target += centerPos.transform.forward * PlayerCenterForwardOffset;
-                                target += centerPos.transform.right * PlayerCenterSideOffset;
-                            }
-
+                            target += centerPos.transform.forward * PlayerCenterForwardOffset * sign;
+                            target += centerPos.transform.right * PlayerCenterSideOffset * sign;
                             target.y += PlayerCenterVerticalOffset;
                         }
                         catch { }
