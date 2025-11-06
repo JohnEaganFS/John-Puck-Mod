@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using HarmonyLib;
 using UnityEngine;
 using Unity.Netcode;
@@ -16,6 +17,11 @@ namespace OfficialPuckMod
         public static int DragMode = 2;
         // Quadratic coefficient (deceleration = C * speed^2)
         public static float QuadraticCoefficient = 0.01f;
+        // Grace period (seconds) after stick contact where drag is not applied
+        public static float StickContactGracePeriod = 0.25f;
+
+        // Map last stick-contact time per puck instance
+        public static Dictionary<Puck, float> LastStickContactTime = new Dictionary<Puck, float>();
     }
 
     // Apply a linear drag to puck velocity before the original FixedUpdate runs
@@ -37,6 +43,18 @@ namespace OfficialPuckMod
                 var rb = __instance.Rigidbody;
                 if (rb == null) return;
                 if (rb.isKinematic) return;
+
+                // Grace period: don't apply drag immediately after stick contact
+                float grace = PuckDragHelpers.StickContactGracePeriod;
+                try
+                {
+                    float last;
+                    if (PuckDragHelpers.LastStickContactTime.TryGetValue(__instance, out last))
+                    {
+                        if (Time.time - last <= grace) return; // still in grace period
+                    }
+                }
+                catch { }
 
                 int mode = PuckDragHelpers.DragMode;
                 Vector3 v = rb.linearVelocity;
@@ -61,6 +79,62 @@ namespace OfficialPuckMod
                         rb.linearVelocity = v * factor;
                     }
                 }
+
+                    // Record stick contact timestamps so we can implement a short grace period
+                    static class Puck_Detection_Patch
+                    {
+                        [HarmonyPatch(typeof(Puck), "OnCollisionEnter")]
+                        class OnCollisionEnter_Patch
+                        {
+                            static void Postfix(Puck __instance, Collision collision)
+                            {
+                                try
+                                {
+                                    if (__instance == null || collision == null) return;
+                                    // If the puck touched a stick, record the time
+                                    var stick = collision.gameObject.GetComponentInParent<Stick>();
+                                    if (stick != null)
+                                    {
+                                        PuckDragHelpers.LastStickContactTime[__instance] = Time.time;
+                                    }
+                                }
+                                catch { }
+                            }
+                        }
+
+                        [HarmonyPatch(typeof(Puck), "OnCollisionStay")]
+                        class OnCollisionStay_Patch
+                        {
+                            static void Postfix(Puck __instance, Collision collision)
+                            {
+                                try
+                                {
+                                    if (__instance == null || collision == null) return;
+                                    var stick = collision.gameObject.GetComponentInParent<Stick>();
+                                    if (stick != null)
+                                    {
+                                        PuckDragHelpers.LastStickContactTime[__instance] = Time.time;
+                                    }
+                                }
+                                catch { }
+                            }
+                        }
+
+                        // Clean up dictionary entry when puck despawns to avoid leaks
+                        [HarmonyPatch(typeof(Puck), "OnNetworkDespawn")]
+                        class OnNetworkDespawn_Patch
+                        {
+                            static void Postfix(Puck __instance)
+                            {
+                                try
+                                {
+                                    if (__instance == null) return;
+                                    try { PuckDragHelpers.LastStickContactTime.Remove(__instance); } catch { }
+                                }
+                                catch { }
+                            }
+                        }
+                    }
                 else if (mode == 2)
                 {
                     // Quadratic drag: deceleration magnitude = C * speed^2
