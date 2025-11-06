@@ -46,7 +46,7 @@ namespace OfficialPuckMod
     // Configurable puck scale (1.0 = default). Change this to make pucks bigger/smaller.
     public static float PuckScale = 0.92f;
     // Configurable puck maximum linear speed (units/sec). Set to 0 or negative to disable clamping.
-    public static float PuckMaxSpeed = 50f;
+    public static float PuckMaxSpeed = 38f;
 
         public static void Init()
         {
