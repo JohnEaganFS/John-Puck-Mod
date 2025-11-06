@@ -76,9 +76,6 @@ namespace OfficialPuckMod
         // When UseOverridePosition is true this value is used directly (world space)
         public static Vector3 OverridePosition = new Vector3(0f, 0.05f, 0f);
 
-    // If true, attempt to use the PlayerPosition named/role "Center" as a baseline. Falls back to PuckPosition transform.
-    public static bool UsePlayerCenterBaseline = false;
-
     // Internal flag set when GameManager transitions FaceOff -> Playing so we can treat the Playing spawn as a faceoff
     // Defaults to false; the patch will only modify the Playing-phase spawn when this flag is set by the phase-change hook.
     public static bool TreatNextPlayingSpawnAsFaceoff = false;
@@ -155,12 +152,7 @@ namespace OfficialPuckMod
 
                 Debug.Log(string.Format("[FaceoffTweaks] Found {0} puckPositions.", puckPositions.Count));
 
-                // Convenience: cached access to PlayerPositionManager for optional center-baseline
-                PlayerPositionManager ppManager = null;
-                if (FaceoffTweaksHelpers.UsePlayerCenterBaseline)
-                {
-                    try { ppManager = NetworkBehaviourSingleton<PlayerPositionManager>.Instance; } catch { ppManager = null; }
-                }
+                // (No player-position baseline in this helper; puck spawn uses PuckPosition or an explicit override.)
 
                 // Only adjust puck positions that are configured for Playing (the manager will spawn those when phase==Playing)
                 foreach (PuckPosition puckPosition in puckPositions)
@@ -173,34 +165,10 @@ namespace OfficialPuckMod
 
                     Debug.Log(string.Format("[FaceoffTweaks] Base puckPosition at {0}", spawnPos));
 
-                    // Option: use override position or PlayerPosition "Center" baseline if requested
+                    // Option: use override position if requested; otherwise keep the configured puckPosition transform
                     if (FaceoffTweaksHelpers.UseOverridePosition)
                     {
                         spawnPos = FaceoffTweaksHelpers.OverridePosition;
-                    }
-                    else if (ppManager != null)
-                    {
-                        try
-                        {
-                            // Try to find a PlayerPosition whose Name contains "center" (case-insensitive)
-                            PlayerPosition centerPos = ppManager.AllPositions.Find(p => p != null && !string.IsNullOrEmpty(p.Name) && p.Name.ToLower().Contains("center"));
-                            if (centerPos != null)
-                            {
-                                // If the center position is claimed by a player, prefer that player's world position
-                                if (centerPos.IsClaimed && centerPos.ClaimedBy != null)
-                                {
-                                    spawnPos = centerPos.ClaimedBy.transform.position;
-                                }
-                                else
-                                {
-                                    spawnPos = centerPos.transform.position;
-                                }
-                            }
-                        }
-                        catch (Exception)
-                        {
-                            // Ignore and fall back to configured puckPosition transform
-                        }
                     }
 
                     // Apply configured offsets relative to puckPosition transform axes
