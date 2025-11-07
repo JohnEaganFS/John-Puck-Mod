@@ -74,7 +74,7 @@ namespace OfficialPuckMod
         // If true, use a fixed override position instead of the scene PuckPosition
         public static bool UseOverridePosition = true;
         // When UseOverridePosition is true this value is used directly (world space)
-        public static Vector3 OverridePosition = new Vector3(0f, 0.05f, 0f);
+        public static Vector3 OverridePosition = new Vector3(0f, -0.49f, 0f);
 
     // Internal flag set when GameManager transitions FaceOff -> Playing so we can treat the Playing spawn as a faceoff
     // Defaults to false; the patch will only modify the Playing-phase spawn when this flag is set by the phase-change hook.

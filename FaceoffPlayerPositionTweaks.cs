@@ -64,7 +64,7 @@ namespace OfficialPuckMod
 
         // If true, use a fixed override position instead of adjusting based on the scene PlayerPosition
         public static bool UsePlayerCenterOverridePosition = true;
-        public static Vector3 PlayerCenterOverridePosition = new Vector3(0f, 0f, 5f);
+        public static Vector3 PlayerCenterOverridePosition = new Vector3(0f, 0f, 3.5f);
 
         // Offsets applied relative to the found PlayerPosition transform (forward/right) or to the override
         public static float PlayerCenterForwardOffset = 0f;
