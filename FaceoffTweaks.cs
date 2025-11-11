@@ -71,10 +71,18 @@ namespace OfficialPuckMod
         // Random jitter radius in meters (horizontal plane)
         public static float RandomRadius = 0f;
 
+    // Puck initial velocity options for faceoff spawns
+    // If true, use an explicit world-space velocity when spawning the puck
+    public static bool UseOverridePuckVelocity = true;
+    public static Vector3 OverridePuckVelocity = new Vector3(0f, 6f, 0f);
+    // If true, apply an initial forward velocity in the spawn rotation's forward direction
+    public static bool UseInitialForwardPuckSpeed = false;
+    public static float InitialForwardPuckSpeed = 0f;
+
         // If true, use a fixed override position instead of the scene PuckPosition
         public static bool UseOverridePosition = true;
         // When UseOverridePosition is true this value is used directly (world space)
-        public static Vector3 OverridePosition = new Vector3(0f, 0.05f, 0f);
+        public static Vector3 OverridePosition = new Vector3(0f, 0.5f, 0f);
 
     // Internal flag set when GameManager transitions FaceOff -> Playing so we can treat the Playing spawn as a faceoff
     // Defaults to false; the patch will only modify the Playing-phase spawn when this flag is set by the phase-change hook.
@@ -183,9 +191,25 @@ namespace OfficialPuckMod
                         spawnPos += new Vector3(jitter2.x, 0f, jitter2.y);
                     }
 
+                    // Compute initial velocity for the spawned puck (optional)
+                    Vector3 initialVel = Vector3.zero;
+                    try
+                    {
+                        if (FaceoffTweaksHelpers.UseOverridePuckVelocity)
+                        {
+                            initialVel = FaceoffTweaksHelpers.OverridePuckVelocity;
+                        }
+                        else if (FaceoffTweaksHelpers.UseInitialForwardPuckSpeed)
+                        {
+                            // spawnRot * Vector3.forward gives the forward direction in world space
+                            initialVel = spawnRot * Vector3.forward * FaceoffTweaksHelpers.InitialForwardPuckSpeed;
+                        }
+                    }
+                    catch { }
+
                     // Spawn using the manager's spawn helper
-                    Debug.Log(string.Format("[FaceoffTweaks] Spawning puck at {0}", spawnPos));
-                    __instance.Server_SpawnPuck(spawnPos, spawnRot, Vector3.zero, false);
+                    Debug.Log(string.Format("[FaceoffTweaks] Spawning puck at {0} with initialVel={1}", spawnPos, initialVel));
+                    __instance.Server_SpawnPuck(spawnPos, spawnRot, initialVel, false);
                 }
 
                 // If we treated a Playing spawn as faceoff, clear the flag so subsequent Playing spawns are normal
