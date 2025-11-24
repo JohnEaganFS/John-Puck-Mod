@@ -29,9 +29,9 @@ namespace OfficialPuckMod
 
         // PlayerBodyV2 multipliers for balance timings
         // balanceRecoveryTime: how long it takes to recover balance after a fall (higher = slower recovery)
-        public static float BalanceRecoveryTimeMultiplier = 0.8f;
+        public static float BalanceRecoveryTimeMultiplier = 0.62f;
         // balanceLossTime: how long it takes to lose balance when slipping (higher = slower loss)
-        public static float BalanceLossTimeMultiplier = 0.3f;
+        public static float BalanceLossTimeMultiplier = 1.0f;
 
         // Keep originals per-instance so we don't compound multipliers
         class OriginalValues
