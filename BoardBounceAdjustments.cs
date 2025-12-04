@@ -16,7 +16,7 @@ static class BoardBounceAdjustments_Patch
     // Local configurable defaults — do not rely on ValueTweaks for these.
     // Fraction of the soft-collision linear force to cancel at the Rigidbody COM (0..1).
     // 0 = do not cancel (original behavior). 1 = cancel all linear component (pure rotation).
-    public static float SoftCollisionLinearReduction = 0.2f;
+    public static float SoftCollisionLinearReduction = 0.175f;
     // Fallback soft collision force used if reflection cannot read the instance field.
     public static float SoftCollisionForceDefault = 1f;
     // Enable debug logging for adjustments (may be chatty)
@@ -93,6 +93,8 @@ static class BoardBounceAdjustments_Patch
             }
             catch { magnitude = 0f; }
 
+            
+
             float num = 1f - magnitude;
             float effectiveSoft = softCollisionForce;
 
@@ -106,6 +108,7 @@ static class BoardBounceAdjustments_Patch
             try
             {
                 rb.AddForce(cancel, ForceMode.Acceleration);
+
                 try { if (DebugLogging) Debug.Log($"[BoardBounceAdjustments] Cancelled {reduction * 100f}% of soft collision linear force: cancel={cancel}"); } catch { }
             }
             catch (Exception e)
