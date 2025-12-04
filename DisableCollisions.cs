@@ -283,7 +283,7 @@ namespace OfficialPuckMod
                     {
                         if (b == null) continue;
                         bool bBlade = b.tag == "Stick Blade";
-                        if (aBlade && bBlade) Physics.IgnoreCollision(a, b, false);
+                        if (aBlade && bBlade) Physics.IgnoreCollision(a, b, true);
                         else Physics.IgnoreCollision(a, b, true);
                     }
                 }
