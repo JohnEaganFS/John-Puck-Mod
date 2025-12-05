@@ -13,24 +13,26 @@ namespace OfficialPuckMod
         public static bool Enabled = true;
 
         // Multipliers (default 1.0 = no change). Set at runtime to tweak behaviour.
-        public static float TurnAccelerationMultiplier = 1.18f;
-        public static float TurnMaxSpeedMultiplier = 1.0764f;
-        public static float MaxBackwardsSpeedMultiplier = 1.035f;
-        public static float MaxBackwardsSprintSpeedMultiplier = 1.05f;
-        public static float BackwardsAccelerationMultiplier = 1.5f;
-        public static float BackwardsSprintAccelerationMultiplier = 1.5f;
-
-        // PHL Multipliers
-        // public static float TurnAccelerationMultiplier = 1.12f;
+        // public static float TurnAccelerationMultiplier = 1.18f;
         // public static float TurnMaxSpeedMultiplier = 1.0764f;
         // public static float MaxBackwardsSpeedMultiplier = 1.035f;
         // public static float MaxBackwardsSprintSpeedMultiplier = 1.05f;
         // public static float BackwardsAccelerationMultiplier = 1.5f;
         // public static float BackwardsSprintAccelerationMultiplier = 1.5f;
-        // public static float TurnBrakeAccelerationMultiplier = 1.785f;
+
+        // PHL Multipliers
+        public static float TurnAccelerationMultiplier = 1.12f;
+        public static float TurnMaxSpeedMultiplier = 1.0764f;
+        public static float MaxBackwardsSpeedMultiplier = 1.035f;
+        public static float MaxBackwardsSprintSpeedMultiplier = 1.05f;
+        public static float BackwardsAccelerationMultiplier = 1.5f;
+        public static float BackwardsSprintAccelerationMultiplier = 1.5f;
+        
 
         // Additional movement multipliers
-        public static float TurnBrakeAccelerationMultiplier = 2.3f;
+        // public static float TurnBrakeAccelerationMultiplier = 2.3f;
+        // PHL
+        public static float TurnBrakeAccelerationMultiplier = 1.785f;
         public static float TurnDragMultiplier = 1.0f;
 
         // VelocityLean multiplier for angular force
