@@ -20,7 +20,7 @@ static class BoardBounceAdjustments_Patch
     // Fallback soft collision force used if reflection cannot read the instance field.
     public static float SoftCollisionForceDefault = 1f;
     // Enable debug logging for adjustments (may be chatty)
-    public static bool DebugLogging = false;
+    public static bool DebugLogging = true;
     static void Postfix(StickPositioner __instance, RaycastHit hit, Vector3 hitPosition)
     {
         try
