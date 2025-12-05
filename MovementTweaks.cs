@@ -25,7 +25,8 @@ namespace OfficialPuckMod
         public static float TurnDragMultiplier = 1.0f;
 
         // VelocityLean multiplier for angular force
-        public static float VelocityLeanAngularForceMultiplier = 0.87f;
+        // public static float VelocityLeanAngularForceMultiplier = 0.87f;
+        public static float VelocityLeanAngularForceMultiplier = 1.0f;
 
         // PlayerBodyV2 multipliers for balance timings
         // balanceRecoveryTime: how long it takes to recover balance after a fall (higher = slower recovery)
