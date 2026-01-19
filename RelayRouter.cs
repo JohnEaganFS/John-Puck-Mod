@@ -49,8 +49,9 @@ namespace JohnRelayMod
         // When set, this relay will be used to replace the target endpoint
         public static RelayServerConfig SelectedRelay = null;
         // Debug default values (edit as needed for testing)
-        public static string DebugRelayAddress = "172.237.155.226";
-        public static ushort DebugRelayPort = 7779;
+        public static string DebugRelayAddress = "172.236.114.212"; // Linode (old)
+        // public static string DebugRelayAddress = "193.239.237.67"; // Clouvider
+        public static ushort DebugRelayPort = 8010;
         public static string DebugRelayName = "Debug Relay";
 
         public static void Init()
