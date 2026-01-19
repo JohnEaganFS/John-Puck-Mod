@@ -37,14 +37,14 @@ namespace JohnRelayMod
     [HarmonyPatch(typeof(ConnectionManagerController), "Event_Client_OnServerBrowserClickServer")]
     static class ConnectionManagerController_Event_Client_OnServerBrowserClickServer_Patch
     {
-        static void Prefix(Dictionary<string, object> message)
+        static bool Prefix(Dictionary<string, object> message)
         {
             try
             {
-                if (message == null) return;
-                if (!message.ContainsKey("serverBrowserServer")) return;
+                if (message == null) return true;
+                if (!message.ContainsKey("serverBrowserServer")) return true;
                 var serverObj = message["serverBrowserServer"] as ServerBrowserServer;
-                if (serverObj == null) return;
+                if (serverObj == null) return true;
 
                 var entry = RelayRouterHelpers.FindServerEntry(serverObj.ipAddress, serverObj.port);
                 if (entry != null)
@@ -72,6 +72,31 @@ namespace JohnRelayMod
                         {
                             var content = new PopupContentText(popupMgr.popupContentTextAsset, text);
                             popupMgr.ShowPopup(popupName, "Relay Options", content, true, true);
+
+                            // add a one-time listener to resume connection when the popup is closed
+                            Action<Dictionary<string, object>> onHide = null;
+                            onHide = (d) =>
+                            {
+                                try
+                                {
+                                    if (d == null) return;
+                                    if (!d.ContainsKey("name")) return;
+                                    var nameObj = d["name"] as string;
+                                    if (nameObj == popupName)
+                                    {
+                                        MonoBehaviourSingleton<EventManager>.Instance.RemoveEventListener("Event_Client_OnPopupHide", onHide);
+                                        // proceed to start client to the original server (Harmony will redirect if SelectedRelay is set)
+                                        ConnectionManager.Instance.Client_StartClient(serverObj.ipAddress, serverObj.port, "");
+                                    }
+                                }
+                                catch (Exception ex2)
+                                {
+                                    Debug.LogException(ex2);
+                                }
+                            };
+                            MonoBehaviourSingleton<EventManager>.Instance.AddEventListener("Event_Client_OnPopupHide", onHide);
+                            // do not run the original handler now; wait for popup close
+                            return false;
                         }
                     }
                     catch (Exception ex)
@@ -84,6 +109,8 @@ namespace JohnRelayMod
             {
                 Debug.LogException(e);
             }
+            // allow original handler to run if we didn't specially handle the click
+            return true;
         }
     }
 }
