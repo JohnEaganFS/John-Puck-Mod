@@ -20,6 +20,8 @@ namespace JohnRelayMod
                     RelayRouterHelpers.SetSelectedRelay(first.Address, first.Port, first.Name);
                     Debug.Log(string.Format("[RelayRouterMod] Enabled. Selected relay set to {0}:{1} ({2})", first.Address, first.Port, first.Name));
                 }
+                // Initialize the relay selection UI/controller
+                RelaySelectionUI.Init();
                 return true;
             }
             catch (Exception e)
@@ -35,6 +37,8 @@ namespace JohnRelayMod
             {
                 // Clear debug relay when disabling
                 RelayRouterHelpers.ClearSelectedRelay();
+                // Shutdown the relay selection UI/controller
+                RelaySelectionUI.Shutdown();
                 RelayRouterHelpers.Shutdown();
                 Debug.Log("[RelayRouterMod] Disabled.");
                 return true;
@@ -117,7 +121,10 @@ namespace JohnRelayMod
                 // add the first known relay as an available option for this original server (if present)
                 if (KnownRelays != null && KnownRelays.Count > 0)
                 {
-                    entry.RelayOptions.Add(KnownRelays[0]);
+                    for (int i = 0; i < KnownRelays.Count; i++)
+                    {
+                        entry.RelayOptions.Add(KnownRelays[i]);
+                    }
                 }
                 ServerRegistry.Add(entry);
                 Debug.Log(string.Format("[RelayRouterHelpers] Server registry seeded with {0}:{1}", entry.OriginalAddress, entry.OriginalPort));
