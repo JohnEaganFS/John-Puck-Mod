@@ -14,9 +14,9 @@ namespace JohnRelayMod
             {
                 RelayRouterHelpers.Init();
                 // Set first known relay on enable for testing (if any)
-                if (RelayRouterHelpers.KnownRelays != null && RelayRouterHelpers.KnownRelays.Count > 0)
+                if (RelayRouterHelpers.GlobalKnownRelays != null && RelayRouterHelpers.GlobalKnownRelays.Count > 0)
                 {
-                    var first = RelayRouterHelpers.KnownRelays[0];
+                    var first = RelayRouterHelpers.GlobalKnownRelays[0];
                     RelayRouterHelpers.SetSelectedRelay(first.Address, first.Port, first.Name);
                     Debug.Log(string.Format("[RelayRouterMod] Enabled. Selected relay set to {0}:{1} ({2})", first.Address, first.Port, first.Name));
                 }
@@ -59,38 +59,86 @@ namespace JohnRelayMod
         public static RelayServerConfig SelectedRelay = null;
 
         // Global list of known relays you can add to; seeded with a debug relay
-        public static List<RelayServerConfig> KnownRelays = new List<RelayServerConfig>
+        public static List<RelayServerConfig> KnownRelays_Linode = new List<RelayServerConfig>
         {
             new RelayServerConfig { Name = "Linode (Chicago 1)", Address = "172.236.114.212", Port = 8010 },
-            new RelayServerConfig { Name = "Clouvider (Chicago 1)", Address = "193.239.237.67", Port = 8010 }
+            new RelayServerConfig { Name = "Clouvider (Chicago 1)", Address = "193.239.237.67", Port = 8010 },
+            new RelayServerConfig { Name = "Cherry (Chicago 1)", Address = "84.32.131.121", Port = 8010 },
+            new RelayServerConfig { Name = "Vultr (Chicago 1)", Address = "149.28.119.78", Port = 8010 }
         };
 
-        // Helpers to manage the KnownRelays list
+        public static List<RelayServerConfig> KnownRelays_Clouvider = new List<RelayServerConfig>
+        {
+            new RelayServerConfig { Name = "Linode (Chicago 1)", Address = "172.236.114.212", Port = 8011 },
+            new RelayServerConfig { Name = "Cherry (Chicago 1)", Address = "84.32.131.121", Port = 8011 },
+            new RelayServerConfig { Name = "Vultr (Chicago 1)", Address = "149.28.119.78", Port = 8011 }
+        };
+
+        // Global fallback list of known relays (generic)
+        public static List<RelayServerConfig> GlobalKnownRelays = new List<RelayServerConfig>();
+
+        // Per-original-server mapping of known relays. Key format: "address:port"
+        public static Dictionary<string, List<RelayServerConfig>> KnownRelaysByServer = new Dictionary<string, List<RelayServerConfig>>();
+
+        private static string ServerKey(string address, ushort port) => string.Format("{0}:{1}", address, port);
+
+        // Register a global known relay
         public static void RegisterKnownRelay(RelayServerConfig relay)
         {
             if (relay == null) return;
-            KnownRelays.Add(relay);
+            GlobalKnownRelays.Add(relay);
         }
 
         public static void RegisterKnownRelay(string name, string address, ushort port)
         {
-            KnownRelays.Add(new RelayServerConfig { Name = name, Address = address, Port = port });
+            GlobalKnownRelays.Add(new RelayServerConfig { Name = name, Address = address, Port = port });
         }
 
+        // Register a relay specifically for an original server (originalAddress:originalPort)
+        public static void RegisterKnownRelayForServer(string originalAddress, ushort originalPort, RelayServerConfig relay)
+        {
+            if (relay == null) return;
+            var key = ServerKey(originalAddress, originalPort);
+            if (!KnownRelaysByServer.ContainsKey(key)) KnownRelaysByServer[key] = new List<RelayServerConfig>();
+            KnownRelaysByServer[key].Add(relay);
+        }
+
+        public static void RegisterKnownRelayForServer(string originalAddress, ushort originalPort, string name, string address, ushort port)
+        {
+            RegisterKnownRelayForServer(originalAddress, originalPort, new RelayServerConfig { Name = name, Address = address, Port = port });
+        }
+
+        // Find a known relay by name in the global list
         public static RelayServerConfig FindKnownRelayByName(string name)
         {
-            foreach (var r in KnownRelays)
+            foreach (var r in GlobalKnownRelays)
                 if (string.Equals(r.Name, name, StringComparison.OrdinalIgnoreCase))
                     return r;
             return null;
         }
 
+        // Find a known relay by name scoped to an original server
+        public static RelayServerConfig FindKnownRelayByNameForServer(string originalAddress, ushort originalPort, string name)
+        {
+            var key = ServerKey(originalAddress, originalPort);
+            if (KnownRelaysByServer.TryGetValue(key, out var list))
+            {
+                foreach (var r in list)
+                    if (string.Equals(r.Name, name, StringComparison.OrdinalIgnoreCase))
+                        return r;
+            }
+            return null;
+        }
+
+        // Remove a global known relay by name
         public static bool RemoveKnownRelayByName(string name)
         {
             var r = FindKnownRelayByName(name);
-            if (r != null) return KnownRelays.Remove(r);
+            if (r != null) return GlobalKnownRelays.Remove(r);
             return false;
         }
+
+        
 
         // In-code registry of known original servers and their candidate relays
         public static List<ServerRelayEntry> ServerRegistry = new List<ServerRelayEntry>();
@@ -117,17 +165,32 @@ namespace JohnRelayMod
             {
                 if (ServerRegistry.Count > 0) return;
 
-                var entry = new ServerRelayEntry("172.237.155.226", 7779);
-                // add the first known relay as an available option for this original server (if present)
-                if (KnownRelays != null && KnownRelays.Count > 0)
+                var entry_1 = new ServerRelayEntry("172.237.155.226", 7779); // Linode server as original
+                var entry_2 = new ServerRelayEntry("193.239.237.67", 7779); // Clouvider server as original
+                // Prefer per-server configured lists, fall back to the pre-seeded lists
+                var key1 = ServerKey(entry_1.OriginalAddress, entry_1.OriginalPort);
+                if (KnownRelaysByServer.TryGetValue(key1, out var perList1) && perList1 != null && perList1.Count > 0)
                 {
-                    for (int i = 0; i < KnownRelays.Count; i++)
-                    {
-                        entry.RelayOptions.Add(KnownRelays[i]);
-                    }
+                    foreach (var r in perList1) entry_1.RelayOptions.Add(r);
                 }
-                ServerRegistry.Add(entry);
-                Debug.Log(string.Format("[RelayRouterHelpers] Server registry seeded with {0}:{1}", entry.OriginalAddress, entry.OriginalPort));
+                else if (KnownRelays_Linode != null && KnownRelays_Linode.Count > 0)
+                {
+                    foreach (var r in KnownRelays_Linode) entry_1.RelayOptions.Add(r);
+                }
+
+                var key2 = ServerKey(entry_2.OriginalAddress, entry_2.OriginalPort);
+                if (KnownRelaysByServer.TryGetValue(key2, out var perList2) && perList2 != null && perList2.Count > 0)
+                {
+                    foreach (var r in perList2) entry_2.RelayOptions.Add(r);
+                }
+                else if (KnownRelays_Clouvider != null && KnownRelays_Clouvider.Count > 0)
+                {
+                    foreach (var r in KnownRelays_Clouvider) entry_2.RelayOptions.Add(r);
+                }
+                ServerRegistry.Add(entry_1);
+                ServerRegistry.Add(entry_2);
+                Debug.Log(string.Format("[RelayRouterHelpers] Server registry seeded with {0}:{1}", entry_1.OriginalAddress, entry_1.OriginalPort));
+                Debug.Log(string.Format("[RelayRouterHelpers] Server registry seeded with {0}:{1}", entry_2.OriginalAddress, entry_2.OriginalPort));
             }
             catch (Exception e)
             {

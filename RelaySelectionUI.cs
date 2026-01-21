@@ -55,7 +55,7 @@ namespace JohnRelayMod
 
                     try
                     {
-                        var popupName = string.Format("relaySelect_{0}_{1}", serverObj.ipAddress.Replace('.', '_'), serverObj.port);
+                        var popupName = string.Format("relaySelect_{0}", serverObj.ipAddress.Replace('.', '_'));
                         var popupMgr = UIManager.Instance?.PopupManager;
                         if (popupMgr == null)
                         {
@@ -64,7 +64,7 @@ namespace JohnRelayMod
                         }
 
                         // Show a simple popup; we'll replace its content with buttons
-                        var content = new PopupContentText(popupMgr.popupContentTextAsset, string.Format("Select a relay for {0}:{1}", serverObj.ipAddress, serverObj.port));
+                        var content = new PopupContentText(popupMgr.popupContentTextAsset, string.Format("Select a relay for {0}", serverObj.ipAddress));
                         popupMgr.ShowPopup(popupName, "Relay Options", content, true, true);
 
                         try
