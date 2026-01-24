@@ -120,7 +120,7 @@ namespace JohnRelayMod
                                             {
                                                 Debug.LogException(exBtn);
                                             }
-                                        }) { text = string.Format("{0} ({1})", relay.Name, relay.Address) };
+                                        }) { text = string.Format("{0}", relay.Name) };
                                         btn.style.marginBottom = 4;
                                         btn.style.borderTopWidth = 1;
                                         btn.style.borderBottomWidth = 1;
@@ -278,7 +278,7 @@ namespace JohnRelayMod
                                                     {
                                                         Debug.LogException(exBtn);
                                                     }
-                                                }) { text = string.Format("{0} ({1})", relay.Name, relay.Address) };
+                                                }) { text = string.Format("{0}", relay.Name) };
                                                 btn.style.marginBottom = 4;
                                                 // make button look like an outlined option
                                                 btn.style.borderTopWidth = 1;
