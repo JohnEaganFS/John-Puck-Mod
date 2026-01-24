@@ -141,58 +141,87 @@ namespace JohnRelayMod
                                         btn.style.marginBottom = 4;
                                         btn.style.borderTopWidth = 1;
                                         btn.style.borderBottomWidth = 1;
-                                        btn.style.borderLeftWidth = 1;
-                                        btn.style.borderRightWidth = 1;
-                                        btn.style.borderTopColor = new UnityEngine.Color(0.6f, 0.6f, 0.6f, 1f);
-                                        btn.style.borderBottomColor = new UnityEngine.Color(0.6f, 0.6f, 0.6f, 1f);
-                                        btn.style.borderLeftColor = new UnityEngine.Color(0.6f, 0.6f, 0.6f, 1f);
-                                        btn.style.borderRightColor = new UnityEngine.Color(0.6f, 0.6f, 0.6f, 1f);
-                                        btn.style.paddingLeft = 12;
-                                        btn.style.paddingRight = 6;
-                                        btn.style.paddingTop = 4;
-                                        btn.style.paddingBottom = 4;
-                                        btn.style.unityTextAlign = TextAnchor.MiddleLeft;
-                                        btn.RegisterCallback<MouseEnterEvent>((evt) =>
-                                        {
-                                            try {
-                                                btn.style.backgroundColor = new UnityEngine.Color(0.5f, 0.5f, 0.5f, 1f);
-                                                btn.style.color = new UnityEngine.Color(0f, 0f, 0f, 1f);
-                                            }
-                                            catch (Exception) { }
-                                        });
-                                        btn.RegisterCallback<MouseLeaveEvent>((evt) =>
-                                        {
-                                            try {
-                                                btn.style.backgroundColor = new UnityEngine.Color(0f, 0f, 0f, 0f);
-                                                btn.style.color = new UnityEngine.Color(1f, 1f, 1f, 1f);
-                                            }
-                                            catch (Exception) { }
-                                        });
-                                        contentContainer.Add(btn);
-                                                // start ping coroutine to measure RTT and update button text
+                                                btn.style.marginBottom = 4;
+                                                // make button look like an outlined option
+                                                btn.style.borderTopWidth = 1;
+                                                btn.style.borderBottomWidth = 1;
+                                                btn.style.borderLeftWidth = 1;
+                                                btn.style.borderRightWidth = 1;
+                                                btn.style.borderTopColor = new UnityEngine.Color(0.6f, 0.6f, 0.6f, 1f);
+                                                btn.style.borderBottomColor = new UnityEngine.Color(0.6f, 0.6f, 0.6f, 1f);
+                                                btn.style.borderLeftColor = new UnityEngine.Color(0.6f, 0.6f, 0.6f, 1f);
+                                                btn.style.borderRightColor = new UnityEngine.Color(0.6f, 0.6f, 0.6f, 1f);
+                                                btn.style.paddingLeft = 12;
+                                                btn.style.paddingRight = 6;
+                                                btn.style.paddingTop = 4;
+                                                btn.style.paddingBottom = 4;
+                                                btn.style.unityTextAlign = TextAnchor.MiddleLeft;
+                                                btn.text = "";
+                                                var row = new VisualElement();
+                                                row.style.flexDirection = FlexDirection.Row;
+                                                row.style.alignItems = Align.Center;
+                                                var providerLabel = new Label("");
+                                                providerLabel.style.width = 200;
+                                                providerLabel.style.unityTextAlign = TextAnchor.MiddleLeft;
+                                                providerLabel.text = "";
+                                                var locationLabel = new Label("");
+                                                locationLabel.style.width = 200;
+                                                locationLabel.style.unityTextAlign = TextAnchor.MiddleLeft;
+                                                locationLabel.text = "";
+                                                var pingLabel = new Label("...");
+                                                pingLabel.style.width = 150;
+                                                pingLabel.style.unityTextAlign = TextAnchor.MiddleRight;
+                                                try
+                                                {
+                                                    string full = relay.Name as string ?? "";
+                                                    string a = full;
+                                                    string b = "";
+                                                    var parenIdx = full.LastIndexOf(" (", StringComparison.Ordinal);
+                                                    if (parenIdx > 0 && full.EndsWith(")"))
+                                                    {
+                                                        a = full.Substring(0, parenIdx).Trim();
+                                                        b = full.Substring(parenIdx + 2, full.Length - parenIdx - 3).Trim();
+                                                    }
+                                                    else if (full.Contains(" - ")) { var parts = full.Split(new string[]{" - "}, StringSplitOptions.None); a = parts[0]; b = parts.Length>1?parts[1]:""; }
+                                                    else if (full.Contains("|")) { var parts = full.Split('|'); a = parts[0].Trim(); b = parts.Length>1?parts[1].Trim():""; }
+                                                    else if (full.Contains(",")) { var parts = full.Split(','); a = parts[0].Trim(); b = parts.Length>1?parts[1].Trim():""; }
+                                                    else { var idx = full.LastIndexOf(' '); if (idx>0) { a = full.Substring(0, idx).Trim(); b = full.Substring(idx+1).Trim(); } }
+                                                    providerLabel.text = a;
+                                                    locationLabel.text = b;
+                                                }
+                                                catch { providerLabel.text = relay.Name as string ?? ""; }
+                                                row.Add(providerLabel);
+                                                row.Add(locationLabel);
+                                                row.Add(pingLabel);
+                                                btn.Add(row);
+                                                btn.RegisterCallback<MouseEnterEvent>((evt) =>
+                                                {
+                                                    try {
+                                                        btn.style.backgroundColor = new UnityEngine.Color(0.95f, 0.95f, 0.95f, 1f);
+                                                        btn.style.color = new UnityEngine.Color(0f, 0f, 0f, 1f);
+                                                    }
+                                                    catch (Exception) { }
+                                                });
+                                                btn.RegisterCallback<MouseLeaveEvent>((evt) =>
+                                                {
+                                                    try {
+                                                        btn.style.backgroundColor = new UnityEngine.Color(0f, 0f, 0f, 0f);
+                                                        btn.style.color = new UnityEngine.Color(1f, 1f, 1f, 1f);
+                                                    }
+                                                    catch (Exception) { }
+                                                });
+                                                contentContainer.Add(btn);
                                                 try
                                                 {
                                                     var ipForPing = relay.Address as string;
-                                                    var display = relay.Name as string;
                                                     var evtMgr = MonoBehaviourSingleton<EventManager>.Instance;
                                                     if (evtMgr != null)
                                                     {
-                                                        evtMgr.StartCoroutine(PingAndUpdate(ipForPing, btn, display));
+                                                        evtMgr.StartCoroutine(PingAndUpdate(ipForPing, pingLabel, relay.Name as string));
                                                     }
                                                 }
                                                 catch (Exception) { }
-                                        // start ping coroutine to measure RTT and update button text
-                                        try
-                                        {
-                                            var ipForPing = relay.Address as string;
-                                            var display = relay.Name as string;
-                                            var evtMgr = MonoBehaviourSingleton<EventManager>.Instance;
-                                            if (evtMgr != null)
-                                            {
-                                                evtMgr.StartCoroutine(PingAndUpdate(ipForPing, btn, display));
-                                            }
-                                        }
-                                        catch (Exception) { }
+                                        
                                     }
                                 }
                                 else
@@ -238,9 +267,9 @@ namespace JohnRelayMod
             }
         }
 
-        public static IEnumerator PingAndUpdate(string ip, UnityEngine.UIElements.Button btn, string name)
+        public static IEnumerator PingAndUpdate(string ip, UnityEngine.UIElements.Label pingLabel, string name)
         {
-            if (string.IsNullOrEmpty(ip) || btn == null)
+            if (string.IsNullOrEmpty(ip) || pingLabel == null)
             {
                 yield break;
             }
@@ -266,7 +295,7 @@ namespace JohnRelayMod
             {
                 try
                 {
-                    btn.text = string.Format("{0} ({1} ms)", name, p.time);
+                    pingLabel.text = string.Format("({0} ms)", p.time);
                 }
                 catch (Exception) { }
             }
@@ -274,7 +303,7 @@ namespace JohnRelayMod
             {
                 try
                 {
-                    btn.text = string.Format("{0} (timeout)", name);
+                    pingLabel.text = string.Format("(timeout)");
                 }
                 catch (Exception) { }
             }
@@ -412,6 +441,44 @@ namespace JohnRelayMod
                                                 btn.style.paddingTop = 4;
                                                 btn.style.paddingBottom = 4;
                                                 btn.style.unityTextAlign = TextAnchor.MiddleLeft;
+                                                btn.text = "";
+                                                var row = new VisualElement();
+                                                row.style.flexDirection = FlexDirection.Row;
+                                                row.style.alignItems = Align.Center;
+                                                var providerLabel = new Label("");
+                                                providerLabel.style.width = 200;
+                                                providerLabel.style.unityTextAlign = TextAnchor.MiddleLeft;
+                                                providerLabel.text = "";
+                                                var locationLabel = new Label("");
+                                                locationLabel.style.width = 200;
+                                                locationLabel.style.unityTextAlign = TextAnchor.MiddleLeft;
+                                                locationLabel.text = "";
+                                                var pingLabel = new Label("...");
+                                                pingLabel.style.width = 150;
+                                                pingLabel.style.unityTextAlign = TextAnchor.MiddleRight;
+                                                try
+                                                {
+                                                    string full = relay.Name as string ?? "";
+                                                    string a = full;
+                                                    string b = "";
+                                                    var parenIdx = full.LastIndexOf(" (", StringComparison.Ordinal);
+                                                    if (parenIdx > 0 && full.EndsWith(")"))
+                                                    {
+                                                        a = full.Substring(0, parenIdx).Trim();
+                                                        b = full.Substring(parenIdx + 2, full.Length - parenIdx - 3).Trim();
+                                                    }
+                                                    else if (full.Contains(" - ")) { var parts = full.Split(new string[]{" - "}, StringSplitOptions.None); a = parts[0]; b = parts.Length>1?parts[1]:""; }
+                                                    else if (full.Contains("|")) { var parts = full.Split('|'); a = parts[0].Trim(); b = parts.Length>1?parts[1].Trim():""; }
+                                                    else if (full.Contains(",")) { var parts = full.Split(','); a = parts[0].Trim(); b = parts.Length>1?parts[1].Trim():""; }
+                                                    else { var idx = full.LastIndexOf(' '); if (idx>0) { a = full.Substring(0, idx).Trim(); b = full.Substring(idx+1).Trim(); } }
+                                                    providerLabel.text = a;
+                                                    locationLabel.text = b;
+                                                }
+                                                catch { providerLabel.text = relay.Name as string ?? ""; }
+                                                row.Add(providerLabel);
+                                                row.Add(locationLabel);
+                                                row.Add(pingLabel);
+                                                btn.Add(row);
                                                 btn.RegisterCallback<MouseEnterEvent>((evt) =>
                                                 {
                                                     try {
@@ -429,15 +496,13 @@ namespace JohnRelayMod
                                                     catch (Exception) { }
                                                 });
                                                 contentContainer.Add(btn);
-                                                // start ping coroutine to measure RTT and update button text
                                                 try
                                                 {
                                                     var ipForPing = relay.Address as string;
-                                                    var display = relay.Name as string;
                                                     var evtMgr = MonoBehaviourSingleton<EventManager>.Instance;
                                                     if (evtMgr != null)
                                                     {
-                                                        evtMgr.StartCoroutine(RelaySelectionUI.PingAndUpdate(ipForPing, btn, display));
+                                                        evtMgr.StartCoroutine(RelaySelectionUI.PingAndUpdate(ipForPing, pingLabel, relay.Name as string));
                                                     }
                                                 }
                                                 catch (Exception) { }
