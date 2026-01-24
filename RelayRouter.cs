@@ -22,6 +22,7 @@ namespace JohnRelayMod
                 }
                 // Initialize the relay selection UI/controller
                 RelaySelectionUI.Init();
+                InServerRelaySelectionUI.Init();
                 return true;
             }
             catch (Exception e)
@@ -38,6 +39,7 @@ namespace JohnRelayMod
                 // Clear debug relay when disabling
                 RelayRouterHelpers.ClearSelectedRelay();
                 // Shutdown the relay selection UI/controller
+                InServerRelaySelectionUI.Shutdown();
                 RelaySelectionUI.Shutdown();
                 RelayRouterHelpers.Shutdown();
                 Debug.Log("[RelayRouterMod] Disabled.");
@@ -57,6 +59,24 @@ namespace JohnRelayMod
 
         // When set, this relay will be used to replace the target endpoint
         public static RelayServerConfig SelectedRelay = null;
+        
+        // Track the client's last attempted connection target (original ip/port)
+        public static string ClientLastTargetAddress = null;
+        public static ushort ClientLastTargetPort = 0;
+
+        public static void SetClientLastTarget(string address, ushort port)
+        {
+            try
+            {
+                ClientLastTargetAddress = address;
+                ClientLastTargetPort = port;
+                Debug.Log(string.Format("[RelayRouterHelpers] ClientLastTarget set to {0}:{1}", address, port));
+            }
+            catch (Exception e)
+            {
+                Debug.LogException(e);
+            }
+        }
 
         // Global list of known relays you can add to; seeded with a debug relay
         public static List<RelayServerConfig> KnownRelays_Linode = new List<RelayServerConfig>
@@ -405,6 +425,9 @@ namespace JohnRelayMod
                 var serverEntry = RelayRouterHelpers.FindServerEntry(ipAddress, port);
                 if (serverEntry != null)
                 {
+                    // Track the client's last attempted target
+                    RelayRouterHelpers.SetClientLastTarget(ipAddress, port);
+                    Debug.Log(string.Format("[ClientLastTarget] Set to {0}:{1}", ipAddress, port));
                     var sel = RelayRouterHelpers.SelectedRelay;
                     if (sel != null)
                     {
