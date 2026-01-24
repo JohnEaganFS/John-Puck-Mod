@@ -100,6 +100,22 @@ namespace JohnRelayMod
                                 directBtn.style.paddingTop = 4;
                                 directBtn.style.paddingBottom = 4;
                                 directBtn.style.unityTextAlign = TextAnchor.MiddleLeft;
+                                directBtn.RegisterCallback<MouseEnterEvent>((evt) =>
+                                {
+                                    try {
+                                        directBtn.style.backgroundColor = new UnityEngine.Color(0.95f, 0.95f, 0.95f, 1f);
+                                        directBtn.style.color = new UnityEngine.Color(0f, 0f, 0f, 1f);
+                                    }
+                                    catch (Exception) { }
+                                });
+                                directBtn.RegisterCallback<MouseLeaveEvent>((evt) =>
+                                {
+                                    try {
+                                        directBtn.style.backgroundColor = new UnityEngine.Color(0f, 0f, 0f, 0f);
+                                        directBtn.style.color = new UnityEngine.Color(1f, 1f, 1f, 1f);
+                                    }
+                                    catch (Exception) { }
+                                });
                                 contentContainer.Add(directBtn);
 
                                 if (entry.RelayOptions != null && entry.RelayOptions.Count > 0)
@@ -135,6 +151,22 @@ namespace JohnRelayMod
                                         btn.style.paddingTop = 4;
                                         btn.style.paddingBottom = 4;
                                         btn.style.unityTextAlign = TextAnchor.MiddleLeft;
+                                        btn.RegisterCallback<MouseEnterEvent>((evt) =>
+                                        {
+                                            try {
+                                                btn.style.backgroundColor = new UnityEngine.Color(0.5f, 0.5f, 0.5f, 1f);
+                                                btn.style.color = new UnityEngine.Color(0f, 0f, 0f, 1f);
+                                            }
+                                            catch (Exception) { }
+                                        });
+                                        btn.RegisterCallback<MouseLeaveEvent>((evt) =>
+                                        {
+                                            try {
+                                                btn.style.backgroundColor = new UnityEngine.Color(0f, 0f, 0f, 0f);
+                                                btn.style.color = new UnityEngine.Color(1f, 1f, 1f, 1f);
+                                            }
+                                            catch (Exception) { }
+                                        });
                                         contentContainer.Add(btn);
                                     }
                                 }
@@ -258,6 +290,22 @@ namespace JohnRelayMod
                                         directBtn.style.paddingTop = 4;
                                         directBtn.style.paddingBottom = 4;
                                         directBtn.style.unityTextAlign = TextAnchor.MiddleLeft;
+                                        directBtn.RegisterCallback<MouseEnterEvent>((evt) =>
+                                        {
+                                            try {
+                                                directBtn.style.backgroundColor = new UnityEngine.Color(0.95f, 0.95f, 0.95f, 1f);
+                                                directBtn.style.color = new UnityEngine.Color(0f, 0f, 0f, 1f);
+                                            }
+                                            catch (Exception) { }
+                                        });
+                                        directBtn.RegisterCallback<MouseLeaveEvent>((evt) =>
+                                        {
+                                            try {
+                                                directBtn.style.backgroundColor = new UnityEngine.Color(0f, 0f, 0f, 0f);
+                                                directBtn.style.color = new UnityEngine.Color(1f, 1f, 1f, 1f);
+                                            }
+                                            catch (Exception) { }
+                                        });
                                         contentContainer.Add(directBtn);
 
                                         if (entry.RelayOptions != null && entry.RelayOptions.Count > 0)
@@ -296,6 +344,22 @@ namespace JohnRelayMod
                                                 btn.style.paddingTop = 4;
                                                 btn.style.paddingBottom = 4;
                                                 btn.style.unityTextAlign = TextAnchor.MiddleLeft;
+                                                btn.RegisterCallback<MouseEnterEvent>((evt) =>
+                                                {
+                                                    try {
+                                                        btn.style.backgroundColor = new UnityEngine.Color(0.95f, 0.95f, 0.95f, 1f);
+                                                        btn.style.color = new UnityEngine.Color(0f, 0f, 0f, 1f);
+                                                    }
+                                                    catch (Exception) { }
+                                                });
+                                                btn.RegisterCallback<MouseLeaveEvent>((evt) =>
+                                                {
+                                                    try {
+                                                        btn.style.backgroundColor = new UnityEngine.Color(0f, 0f, 0f, 0f);
+                                                        btn.style.color = new UnityEngine.Color(1f, 1f, 1f, 1f);
+                                                    }
+                                                    catch (Exception) { }
+                                                });
                                                 contentContainer.Add(btn);
                                             }
                                         }
