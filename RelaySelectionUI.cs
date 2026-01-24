@@ -121,6 +121,24 @@ namespace JohnRelayMod
 
                                 if (entry.RelayOptions != null && entry.RelayOptions.Count > 0)
                                 {
+                                    // Header row for columns
+                                    var headerRow = new VisualElement();
+                                    headerRow.style.flexDirection = FlexDirection.Row;
+                                    headerRow.style.alignItems = Align.Center;
+                                    var hProv = new Label("Provider");
+                                    hProv.style.width = 212;
+                                    hProv.style.unityTextAlign = TextAnchor.MiddleLeft;
+                                    var hLoc = new Label("Location");
+                                    hLoc.style.width = 280;
+                                    hLoc.style.unityTextAlign = TextAnchor.MiddleLeft;
+                                    var hPing = new Label("Ping to Relay");
+                                    hPing.style.width = 250;
+                                    hPing.style.unityTextAlign = TextAnchor.MiddleLeft;
+                                    headerRow.Add(hProv);
+                                    headerRow.Add(hLoc);
+                                    headerRow.Add(hPing);
+                                    contentContainer.Add(headerRow);
+
                                     foreach (var r in entry.RelayOptions)
                                     {
                                         var relay = r; // closure copy
@@ -165,12 +183,12 @@ namespace JohnRelayMod
                                                 providerLabel.style.unityTextAlign = TextAnchor.MiddleLeft;
                                                 providerLabel.text = "";
                                                 var locationLabel = new Label("");
-                                                locationLabel.style.width = 200;
+                                                locationLabel.style.width = 320;
                                                 locationLabel.style.unityTextAlign = TextAnchor.MiddleLeft;
                                                 locationLabel.text = "";
                                                 var pingLabel = new Label("...");
                                                 pingLabel.style.width = 150;
-                                                pingLabel.style.unityTextAlign = TextAnchor.MiddleRight;
+                                                pingLabel.style.unityTextAlign = TextAnchor.MiddleLeft;
                                                 try
                                                 {
                                                     string full = relay.Name as string ?? "";
@@ -295,7 +313,7 @@ namespace JohnRelayMod
             {
                 try
                 {
-                    pingLabel.text = string.Format("({0} ms)", p.time);
+                    pingLabel.text = string.Format("{0} ms", p.time);
                 }
                 catch (Exception) { }
             }
@@ -407,7 +425,25 @@ namespace JohnRelayMod
 
                                         if (entry.RelayOptions != null && entry.RelayOptions.Count > 0)
                                         {
-                                            foreach (var r in entry.RelayOptions)
+                                                // Header row for columns
+                                                var headerRow = new VisualElement();
+                                                headerRow.style.flexDirection = FlexDirection.Row;
+                                                headerRow.style.alignItems = Align.Center;
+                                                var hProv = new Label("Provider");
+                                                hProv.style.width = 212;
+                                                hProv.style.unityTextAlign = TextAnchor.MiddleLeft;
+                                                var hLoc = new Label("Location");
+                                                hLoc.style.width = 280;
+                                                hLoc.style.unityTextAlign = TextAnchor.MiddleLeft;
+                                                var hPing = new Label("Ping to Relay");
+                                                hPing.style.width = 250;
+                                                hPing.style.unityTextAlign = TextAnchor.MiddleLeft;
+                                                headerRow.Add(hProv);
+                                                headerRow.Add(hLoc);
+                                                headerRow.Add(hPing);
+                                                contentContainer.Add(headerRow);
+
+                                                foreach (var r in entry.RelayOptions)
                                             {
                                                 var relay = r; // closure copy
                                                 var btn = new Button(() =>
@@ -450,12 +486,12 @@ namespace JohnRelayMod
                                                 providerLabel.style.unityTextAlign = TextAnchor.MiddleLeft;
                                                 providerLabel.text = "";
                                                 var locationLabel = new Label("");
-                                                locationLabel.style.width = 200;
+                                                locationLabel.style.width = 320;
                                                 locationLabel.style.unityTextAlign = TextAnchor.MiddleLeft;
                                                 locationLabel.text = "";
                                                 var pingLabel = new Label("...");
                                                 pingLabel.style.width = 150;
-                                                pingLabel.style.unityTextAlign = TextAnchor.MiddleRight;
+                                                pingLabel.style.unityTextAlign = TextAnchor.MiddleLeft;
                                                 try
                                                 {
                                                     string full = relay.Name as string ?? "";
