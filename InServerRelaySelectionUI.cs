@@ -1,6 +1,7 @@
 using System;
 using UnityEngine;
 using HarmonyLib;
+using System.Linq;
 using System.Collections.Generic;
 using UnityEngine.UIElements;
 using System.Reflection;
@@ -10,11 +11,20 @@ namespace JohnRelayMod
     // In-server relay selection UI: minimal init/shutdown hooks.
     public static class InServerRelaySelectionUI
     {
+        // GameObject used for runtime checks/injection fallback
+        static GameObject _runnerObject;
+
         public static void Init()
         {
             try
             {
                 Debug.Log("[InServerRelaySelectionUI] Initialized.");
+                if (_runnerObject == null)
+                {
+                    _runnerObject = new GameObject("InServerRelaySelectionRunner");
+                    UnityEngine.Object.DontDestroyOnLoad(_runnerObject);
+                    _runnerObject.AddComponent<InServerRelaySelectionRunner>();
+                }
             }
             catch (Exception e)
             {
@@ -22,11 +32,18 @@ namespace JohnRelayMod
             }
         }
 
+        
+
         public static void Shutdown()
         {
             try
             {
                 Debug.Log("[InServerRelaySelectionUI] Shutdown.");
+                if (_runnerObject != null)
+                {
+                    UnityEngine.Object.Destroy(_runnerObject);
+                    _runnerObject = null;
+                }
             }
             catch (Exception e)
             {
@@ -57,23 +74,6 @@ namespace JohnRelayMod
 
                 // Delegate to the shared RelaySelectionUI popup helper
                 RelaySelectionUI.ShowRelaySelectionForServer(targetIp, targetPort);
-            }
-            catch (Exception e)
-            {
-                Debug.LogException(e);
-            }
-        }
-    }
-
-    // Inject a Relay Selection button into the pause menu after initialization.
-    [HarmonyPatch(typeof(UIPauseMenu), "Initialize")]
-    static class UIPauseMenu_Initialize_Patch
-    {
-        static void Postfix(UIPauseMenu __instance, VisualElement rootVisualElement)
-        {
-            try
-            {
-                Debug.Log("[InServerRelaySelectionUI] Injecting Relay Selection button into Pause Menu.");
             }
             catch (Exception e)
             {
@@ -132,6 +132,52 @@ namespace JohnRelayMod
                 Debug.LogException(e);
             }
             return true;
+        }
+    }
+
+    // Inject a Relay Selection button into the pause menu using the Initialize's rootVisualElement
+    [HarmonyPatch(typeof(UIPauseMenu), "Initialize")]
+    static class UIPauseMenu_Initialize_Patch
+    {
+        static void Postfix(UIPauseMenu __instance, VisualElement rootVisualElement)
+        {
+            try
+            {
+                if (rootVisualElement == null) return;
+                var container = rootVisualElement.Q("PauseMenuContainer");
+                if (container == null) return;
+
+                // avoid duplicate by a fixed element name
+                var existing = container.Q<Button>("RelaySelectionButton");
+                if (existing != null) return;
+
+                var relayBtn = new Button(() => { InServerRelaySelectionUI.ShowRelaySelectionForCurrentServer(); }) { text = "Relay Selection" };
+                relayBtn.name = "RelaySelectionButton";
+                relayBtn.style.marginTop = 4;
+                relayBtn.style.marginBottom = 4;
+                relayBtn.style.backgroundColor = new StyleColor(new Color(0.15f, 0.15f, 0.15f));
+                relayBtn.style.color = new StyleColor(Color.white);
+                relayBtn.style.borderTopWidth = 1;
+                relayBtn.style.borderBottomWidth = 1;
+                relayBtn.style.borderLeftWidth = 1;
+                relayBtn.style.borderRightWidth = 1;
+                relayBtn.style.borderTopColor = new StyleColor(new Color(0.35f, 0.35f, 0.35f));
+                relayBtn.style.borderBottomColor = new StyleColor(new Color(0.35f, 0.35f, 0.35f));
+                relayBtn.style.borderLeftColor = new StyleColor(new Color(0.35f, 0.35f, 0.35f));
+                relayBtn.style.borderRightColor = new StyleColor(new Color(0.35f, 0.35f, 0.35f));
+                relayBtn.style.paddingLeft = 6;
+                relayBtn.style.paddingRight = 6;
+                relayBtn.style.paddingTop = 2;
+                relayBtn.style.paddingBottom = 2;
+
+                // add the relay button to the pause menu
+                container.Add(relayBtn);
+                Debug.Log("[InServerRelaySelectionUI] Injected Relay Selection button into pause menu via Initialize postfix.");
+            }
+            catch (Exception e)
+            {
+                Debug.LogException(e);
+            }
         }
     }
 }
