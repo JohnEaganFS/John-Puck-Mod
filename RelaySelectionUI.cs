@@ -54,7 +54,7 @@ namespace JohnRelayMod
                 }
 
                 var popupName = string.Format("relaySelect_{0}", ipAddress.Replace('.', '_'));
-                var content = new PopupContentText(popupMgr.popupContentTextAsset, string.Format("Select a relay for {0}", ipAddress));
+                var content = new PopupContentText(popupMgr.popupContentTextAsset, "Select a relay.");
                 popupMgr.ShowPopup(popupName, "Relay Options", content, true, true);
 
                 try
@@ -114,7 +114,7 @@ namespace JohnRelayMod
                                                 RelayRouterHelpers.SetSelectedRelay(relay.Address, relay.Port, relay.Name);
                                                 var hideMethod = popupMgr.GetType().GetMethod("HidePopup", BindingFlags.Public | BindingFlags.Instance);
                                                 hideMethod?.Invoke(popupMgr, new object[] { popupName });
-                                                Debug.Log(string.Format("[RelaySelectionUI] Relay selected: {0} {1}:{2}", relay.Name, relay.Address, relay.Port));
+                                                Debug.Log(string.Format("[RelaySelectionUI] Relay selected: {0}", relay.Name));
                                             }
                                             catch (Exception exBtn)
                                             {

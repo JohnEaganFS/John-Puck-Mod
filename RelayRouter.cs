@@ -92,6 +92,9 @@ namespace JohnRelayMod
             new RelayServerConfig { Name = "Cherry (Chicago 1)", Address = "84.32.131.121", Port = 8011 }
         };
 
+        // Template
+        // new RelayServerConfig { Name = "", Address = "", Port =  },
+
         // PHL Official 1
         public static List<RelayServerConfig> Relays_PHLOfficial1 = new List<RelayServerConfig>
         {
@@ -101,6 +104,9 @@ namespace JohnRelayMod
             new RelayServerConfig { Name = "Clouvider (Chicago)", Address = "193.239.237.14", Port = 9001 },  // Clouvider (Chicago)
             new RelayServerConfig { Name = "Clouvider (Los Angeles)", Address = "45.149.172.59", Port = 9001 },  // Clouvider (Los Angeles)
             new RelayServerConfig { Name = "Clouvider (Virginia)", Address = "77.247.127.41", Port = 9001 },  // Clouvider (Virginia)
+            new RelayServerConfig { Name = "Linode (Chicago)", Address = "172.239.36.57", Port = 9001 }, // Linode (Chicago)
+            new RelayServerConfig { Name = "Linode (Seattle)", Address = "172.232.175.173", Port = 9001 }, // Linode (Seattle)
+            new RelayServerConfig { Name = "Linode (Toronto)", Address = "172.105.17.42", Port = 9001 }, // Linode (Toronto)
             new RelayServerConfig { Name = "OVH (Los Angeles)", Address = "40.160.254.25", Port = 9001 },  // OVH (Los Angeles)
             new RelayServerConfig { Name = "OVH (New York)", Address = "40.160.231.161", Port = 9001 },  // OVH (New York)
             new RelayServerConfig { Name = "OVH (Virginia)", Address = "15.204.223.103", Port = 9001 }  // OVH (Virginia)
@@ -115,6 +121,9 @@ namespace JohnRelayMod
             new RelayServerConfig { Name = "Clouvider (Chicago)", Address = "193.239.237.14", Port = 9002 },  // Clouvider (Chicago)
             new RelayServerConfig { Name = "Clouvider (Los Angeles)", Address = "45.149.172.59", Port = 9002 },  // Clouvider (Los Angeles)
             new RelayServerConfig { Name = "Clouvider (Virginia)", Address = "77.247.127.41", Port = 9002 },  // Clouvider (Virginia)
+            new RelayServerConfig { Name = "Linode (Chicago)", Address = "172.239.36.57", Port = 9002 }, // Linode (Chicago)
+            new RelayServerConfig { Name = "Linode (Seattle)", Address = "172.232.175.173", Port = 9002 }, // Linode (Seattle)
+            new RelayServerConfig { Name = "Linode (Toronto)", Address = "172.105.17.42", Port = 9002 }, // Linode (Toronto)
             new RelayServerConfig { Name = "OVH (Los Angeles)", Address = "40.160.254.25", Port = 9002 },  // OVH (Los Angeles)
             new RelayServerConfig { Name = "OVH (New York)", Address = "40.160.231.161", Port = 9002 },  // OVH (New York)
             new RelayServerConfig { Name = "OVH (Virginia)", Address = "15.204.223.103", Port = 9002 }  // OVH (Virginia)
@@ -129,6 +138,9 @@ namespace JohnRelayMod
             new RelayServerConfig { Name = "Clouvider (Chicago)", Address = "193.239.237.14", Port = 9003 },  // Clouvider (Chicago)
             new RelayServerConfig { Name = "Clouvider (Los Angeles)", Address = "45.149.172.59", Port = 9003 },  // Clouvider (Los Angeles)
             new RelayServerConfig { Name = "Clouvider (Virginia)", Address = "77.247.127.41", Port = 9003 },  // Clouvider (Virginia)
+            new RelayServerConfig { Name = "Linode (Chicago)", Address = "172.239.36.57", Port = 9003 }, // Linode (Chicago)
+            new RelayServerConfig { Name = "Linode (Seattle)", Address = "172.232.175.173", Port = 9003 }, // Linode (Seattle)
+            new RelayServerConfig { Name = "Linode (Toronto)", Address = "172.105.17.42", Port = 9003 }, // Linode (Toronto)
             new RelayServerConfig { Name = "OVH (Los Angeles)", Address = "40.160.254.25", Port = 9003 },  // OVH (Los Angeles)
             new RelayServerConfig { Name = "OVH (New York)", Address = "40.160.231.161", Port = 9003 },  // OVH (New York)
             new RelayServerConfig { Name = "OVH (Virginia)", Address = "15.204.223.103", Port = 9003 }  // OVH (Virginia)
@@ -143,6 +155,9 @@ namespace JohnRelayMod
             new RelayServerConfig { Name = "Clouvider (Chicago)", Address = "193.239.237.14", Port = 9004 },  // Clouvider (Chicago)
             new RelayServerConfig { Name = "Clouvider (Los Angeles)", Address = "45.149.172.59", Port = 9004 },  // Clouvider (Los Angeles)
             new RelayServerConfig { Name = "Clouvider (Virginia)", Address = "77.247.127.41", Port = 9004 },  // Clouvider (Virginia)
+            new RelayServerConfig { Name = "Linode (Chicago)", Address = "172.239.36.57", Port = 9004 }, // Linode (Chicago)
+            new RelayServerConfig { Name = "Linode (Seattle)", Address = "172.232.175.173", Port = 9004 }, // Linode (Seattle)
+            new RelayServerConfig { Name = "Linode (Toronto)", Address = "172.105.17.42", Port = 9004 }, // Linode (Toronto)
             new RelayServerConfig { Name = "OVH (Los Angeles)", Address = "40.160.254.25", Port = 9004 },  // OVH (Los Angeles)
             new RelayServerConfig { Name = "OVH (New York)", Address = "40.160.231.161", Port = 9004 },  // OVH (New York)
             new RelayServerConfig { Name = "OVH (Virginia)", Address = "15.204.223.103", Port = 9004 }  // OVH (Virginia)
@@ -157,6 +172,9 @@ namespace JohnRelayMod
             new RelayServerConfig { Name = "Clouvider (Chicago)", Address = "193.239.237.14", Port = 9005 },  // Clouvider (Chicago)
             new RelayServerConfig { Name = "Clouvider (Los Angeles)", Address = "45.149.172.59", Port = 9005 },  // Clouvider (Los Angeles)
             new RelayServerConfig { Name = "Clouvider (Virginia)", Address = "77.247.127.41", Port = 9005 },  // Clouvider (Virginia)
+            new RelayServerConfig { Name = "Linode (Chicago)", Address = "172.239.36.57", Port = 9005 }, // Linode (Chicago)
+            new RelayServerConfig { Name = "Linode (Seattle)", Address = "172.232.175.173", Port = 9005 }, // Linode (Seattle)
+            new RelayServerConfig { Name = "Linode (Toronto)", Address = "172.105.17.42", Port = 9005 }, // Linode (Toronto)
             new RelayServerConfig { Name = "OVH (Los Angeles)", Address = "40.160.254.25", Port = 9005 },  // OVH (Los Angeles)
             new RelayServerConfig { Name = "OVH (New York)", Address = "40.160.231.161", Port = 9005 },  // OVH (New York)
             new RelayServerConfig { Name = "OVH (Virginia)", Address = "15.204.223.103", Port = 9005 }  // OVH (Virginia)
@@ -171,6 +189,9 @@ namespace JohnRelayMod
             new RelayServerConfig { Name = "Clouvider (Chicago)", Address = "193.239.237.14", Port = 9006 },  // Clouvider (Chicago)
             new RelayServerConfig { Name = "Clouvider (Los Angeles)", Address = "45.149.172.59", Port = 9006 },  // Clouvider (Los Angeles)
             new RelayServerConfig { Name = "Clouvider (Virginia)", Address = "77.247.127.41", Port = 9006 },  // Clouvider (Virginia)
+            new RelayServerConfig { Name = "Linode (Chicago)", Address = "172.239.36.57", Port = 9006 }, // Linode (Chicago)
+            new RelayServerConfig { Name = "Linode (Seattle)", Address = "172.232.175.173", Port = 9006 }, // Linode (Seattle)
+            new RelayServerConfig { Name = "Linode (Toronto)", Address = "172.105.17.42", Port = 9006 }, // Linode (Toronto)
             new RelayServerConfig { Name = "OVH (Los Angeles)", Address = "40.160.254.25", Port = 9006 },  // OVH (Los Angeles)
             new RelayServerConfig { Name = "OVH (New York)", Address = "40.160.231.161", Port = 9006 },  // OVH (New York)
             new RelayServerConfig { Name = "OVH (Virginia)", Address = "15.204.223.103", Port = 9006 }  // OVH (Virginia)
@@ -185,6 +206,9 @@ namespace JohnRelayMod
             new RelayServerConfig { Name = "Clouvider (Chicago)", Address = "193.239.237.14", Port = 9007 },  // Clouvider (Chicago)
             new RelayServerConfig { Name = "Clouvider (Los Angeles)", Address = "45.149.172.59", Port = 9007 },  // Clouvider (Los Angeles)
             new RelayServerConfig { Name = "Clouvider (Virginia)", Address = "77.247.127.41", Port = 9007 },  // Clouvider (Virginia)
+            new RelayServerConfig { Name = "Linode (Chicago)", Address = "172.239.36.57", Port = 9007 }, // Linode (Chicago)
+            new RelayServerConfig { Name = "Linode (Seattle)", Address = "172.232.175.173", Port = 9007 }, // Linode (Seattle)
+            new RelayServerConfig { Name = "Linode (Toronto)", Address = "172.105.17.42", Port = 9007 }, // Linode (Toronto)
             new RelayServerConfig { Name = "OVH (Los Angeles)", Address = "40.160.254.25", Port = 9007 },  // OVH (Los Angeles)
             new RelayServerConfig { Name = "OVH (New York)", Address = "40.160.231.161", Port = 9007 },  // OVH (New York)
             new RelayServerConfig { Name = "OVH (Virginia)", Address = "15.204.223.103", Port = 9007 }  // OVH (Virginia)
@@ -199,6 +223,9 @@ namespace JohnRelayMod
             new RelayServerConfig { Name = "Clouvider (Chicago)", Address = "193.239.237.14", Port = 9008 },  // Clouvider (Chicago)
             new RelayServerConfig { Name = "Clouvider (Los Angeles)", Address = "45.149.172.59", Port = 9008 },  // Clouvider (Los Angeles)
             new RelayServerConfig { Name = "Clouvider (Virginia)", Address = "77.247.127.41", Port = 9008 },  // Clouvider (Virginia)
+            new RelayServerConfig { Name = "Linode (Chicago)", Address = "172.239.36.57", Port = 9008 }, // Linode (Chicago)
+            new RelayServerConfig { Name = "Linode (Seattle)", Address = "172.232.175.173", Port = 9008 }, // Linode (Seattle)
+            new RelayServerConfig { Name = "Linode (Toronto)", Address = "172.105.17.42", Port = 9008 }, // Linode (Toronto)
             new RelayServerConfig { Name = "OVH (Los Angeles)", Address = "40.160.254.25", Port = 9008 },  // OVH (Los Angeles)
             new RelayServerConfig { Name = "OVH (New York)", Address = "40.160.231.161", Port = 9008 },  // OVH (New York)
             new RelayServerConfig { Name = "OVH (Virginia)", Address = "15.204.223.103", Port = 9008 }  // OVH (Virginia)
