@@ -95,7 +95,7 @@ namespace JohnRelayMod
                                 directBtn.style.borderBottomColor = new UnityEngine.Color(0.6f, 0.6f, 0.6f, 1f);
                                 directBtn.style.borderLeftColor = new UnityEngine.Color(0.6f, 0.6f, 0.6f, 1f);
                                 directBtn.style.borderRightColor = new UnityEngine.Color(0.6f, 0.6f, 0.6f, 1f);
-                                directBtn.style.paddingLeft = 6;
+                                directBtn.style.paddingLeft = 12;
                                 directBtn.style.paddingRight = 6;
                                 directBtn.style.paddingTop = 4;
                                 directBtn.style.paddingBottom = 4;
@@ -130,7 +130,7 @@ namespace JohnRelayMod
                                         btn.style.borderBottomColor = new UnityEngine.Color(0.6f, 0.6f, 0.6f, 1f);
                                         btn.style.borderLeftColor = new UnityEngine.Color(0.6f, 0.6f, 0.6f, 1f);
                                         btn.style.borderRightColor = new UnityEngine.Color(0.6f, 0.6f, 0.6f, 1f);
-                                        btn.style.paddingLeft = 6;
+                                        btn.style.paddingLeft = 12;
                                         btn.style.paddingRight = 6;
                                         btn.style.paddingTop = 4;
                                         btn.style.paddingBottom = 4;
@@ -142,6 +142,8 @@ namespace JohnRelayMod
                                 {
                                     var none = new Label("No relays available");
                                     none.style.marginBottom = 4;
+                                    none.style.paddingLeft = 12;
+                                    none.style.unityTextAlign = TextAnchor.MiddleLeft;
                                     contentContainer.Add(none);
                                 }
                             }
@@ -209,7 +211,7 @@ namespace JohnRelayMod
                         }
 
                         // Show a simple popup; we'll replace its content with buttons
-                        var content = new PopupContentText(popupMgr.popupContentTextAsset, string.Format("Select a relay for {0}", serverObj.ipAddress));
+                        var content = new PopupContentText(popupMgr.popupContentTextAsset, string.Format("Select a relay."));
                         popupMgr.ShowPopup(popupName, "Relay Options", content, true, true);
 
                         try
@@ -251,7 +253,7 @@ namespace JohnRelayMod
                                         directBtn.style.borderBottomColor = new UnityEngine.Color(0.6f, 0.6f, 0.6f, 1f);
                                         directBtn.style.borderLeftColor = new UnityEngine.Color(0.6f, 0.6f, 0.6f, 1f);
                                         directBtn.style.borderRightColor = new UnityEngine.Color(0.6f, 0.6f, 0.6f, 1f);
-                                        directBtn.style.paddingLeft = 6;
+                                        directBtn.style.paddingLeft = 12;
                                         directBtn.style.paddingRight = 6;
                                         directBtn.style.paddingTop = 4;
                                         directBtn.style.paddingBottom = 4;
@@ -289,7 +291,7 @@ namespace JohnRelayMod
                                                 btn.style.borderBottomColor = new UnityEngine.Color(0.6f, 0.6f, 0.6f, 1f);
                                                 btn.style.borderLeftColor = new UnityEngine.Color(0.6f, 0.6f, 0.6f, 1f);
                                                 btn.style.borderRightColor = new UnityEngine.Color(0.6f, 0.6f, 0.6f, 1f);
-                                                btn.style.paddingLeft = 6;
+                                                btn.style.paddingLeft = 12;
                                                 btn.style.paddingRight = 6;
                                                 btn.style.paddingTop = 4;
                                                 btn.style.paddingBottom = 4;
@@ -301,6 +303,8 @@ namespace JohnRelayMod
                                         {
                                             var none = new Label("No relays available");
                                             none.style.marginBottom = 4;
+                                            none.style.paddingLeft = 12;
+                                            none.style.unityTextAlign = TextAnchor.MiddleLeft;
                                             contentContainer.Add(none);
                                         }
                                     }
