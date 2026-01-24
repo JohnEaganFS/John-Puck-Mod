@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections;
 using UnityEngine;
 using HarmonyLib;
 using UnityEngine.UIElements;
@@ -168,6 +169,30 @@ namespace JohnRelayMod
                                             catch (Exception) { }
                                         });
                                         contentContainer.Add(btn);
+                                                // start ping coroutine to measure RTT and update button text
+                                                try
+                                                {
+                                                    var ipForPing = relay.Address as string;
+                                                    var display = relay.Name as string;
+                                                    var evtMgr = MonoBehaviourSingleton<EventManager>.Instance;
+                                                    if (evtMgr != null)
+                                                    {
+                                                        evtMgr.StartCoroutine(PingAndUpdate(ipForPing, btn, display));
+                                                    }
+                                                }
+                                                catch (Exception) { }
+                                        // start ping coroutine to measure RTT and update button text
+                                        try
+                                        {
+                                            var ipForPing = relay.Address as string;
+                                            var display = relay.Name as string;
+                                            var evtMgr = MonoBehaviourSingleton<EventManager>.Instance;
+                                            if (evtMgr != null)
+                                            {
+                                                evtMgr.StartCoroutine(PingAndUpdate(ipForPing, btn, display));
+                                            }
+                                        }
+                                        catch (Exception) { }
                                     }
                                 }
                                 else
@@ -212,6 +237,49 @@ namespace JohnRelayMod
                 Debug.LogException(e);
             }
         }
+
+        public static IEnumerator PingAndUpdate(string ip, UnityEngine.UIElements.Button btn, string name)
+        {
+            if (string.IsNullOrEmpty(ip) || btn == null)
+            {
+                yield break;
+            }
+
+            UnityEngine.Ping p = null;
+            try
+            {
+                p = new UnityEngine.Ping(ip);
+            }
+            catch (Exception)
+            {
+                yield break;
+            }
+
+            float start = UnityEngine.Time.realtimeSinceStartup;
+            float timeout = 2.0f; // seconds
+            while (!p.isDone && UnityEngine.Time.realtimeSinceStartup - start < timeout)
+            {
+                yield return null;
+            }
+
+            if (p.isDone)
+            {
+                try
+                {
+                    btn.text = string.Format("{0} ({1} ms)", name, p.time);
+                }
+                catch (Exception) { }
+            }
+            else
+            {
+                try
+                {
+                    btn.text = string.Format("{0} (timeout)", name);
+                }
+                catch (Exception) { }
+            }
+        }
+
     }
 
     // Patch the connection manager's server-browser click handler to log when a registered server is clicked
@@ -361,6 +429,18 @@ namespace JohnRelayMod
                                                     catch (Exception) { }
                                                 });
                                                 contentContainer.Add(btn);
+                                                // start ping coroutine to measure RTT and update button text
+                                                try
+                                                {
+                                                    var ipForPing = relay.Address as string;
+                                                    var display = relay.Name as string;
+                                                    var evtMgr = MonoBehaviourSingleton<EventManager>.Instance;
+                                                    if (evtMgr != null)
+                                                    {
+                                                        evtMgr.StartCoroutine(RelaySelectionUI.PingAndUpdate(ipForPing, btn, display));
+                                                    }
+                                                }
+                                                catch (Exception) { }
                                             }
                                         }
                                         else
