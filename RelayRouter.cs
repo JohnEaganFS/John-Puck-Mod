@@ -459,9 +459,9 @@ namespace JohnRelayMod
                 CreateAndRegisterServerEntry("216.128.145.10", 7779, Relays_PHLOfficial6); // PHL Official 6
                 CreateAndRegisterServerEntry("216.128.145.10", 7781, Relays_PHLOfficial7); // PHL Official 7
                 CreateAndRegisterServerEntry("216.128.145.10", 7783, Relays_PHLOfficial8); // PHL Official 8
-                CreateAndRegisterServerEntry("149.27.115.65", 7777, Relays_PHLPickup1); // PHL Pickup 1
-                CreateAndRegisterServerEntry("149.27.115.65", 7779, Relays_PHLPickup2); // PHL Pickup 2
-                CreateAndRegisterServerEntry("149.27.115.65", 7781, Relays_PHLPickup3); // PHL Pickup 3
+                CreateAndRegisterServerEntry("149.28.115.65", 7777, Relays_PHLPickup1); // PHL Pickup 1
+                CreateAndRegisterServerEntry("149.28.115.65", 7779, Relays_PHLPickup2); // PHL Pickup 2
+                CreateAndRegisterServerEntry("149.28.115.65", 7781, Relays_PHLPickup3); // PHL Pickup 3
                 CreateAndRegisterServerEntry("66.42.126.148", 7777, Relays_PHLPickup4); // PHL Pickup 4
                 CreateAndRegisterServerEntry("66.42.126.148", 7779, Relays_PHLPickup5); // PHL Pickup 5
                 CreateAndRegisterServerEntry("66.42.126.148", 7781, Relays_PHLPickup6); // PHL Pickup 6
