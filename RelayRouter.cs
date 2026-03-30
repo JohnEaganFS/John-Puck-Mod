@@ -282,7 +282,7 @@ namespace JohnRelayMod
             new RelayServerConfig { Name = "OVH (Virginia)", Address = "15.204.223.103", Port = 9013 }  // OVH (Virginia)
         };
 
-        // PHL Pickup 4
+        // PHL Pickup 4 BETA
         public static List<RelayServerConfig> Relays_PHLPickup4 = new List<RelayServerConfig>
         {
             new RelayServerConfig { Name = "Vultr (Atlanta)", Address = "96.30.192.184", Port = 9014 }, // Vultr (Atlanta)
@@ -299,7 +299,7 @@ namespace JohnRelayMod
             new RelayServerConfig { Name = "OVH (Virginia)", Address = "15.204.223.103", Port = 9014 }  // OVH (Virginia)
         };
 
-        // PHL Pickup 5
+        // PHL Pickup 5 BETA
         public static List<RelayServerConfig> Relays_PHLPickup5 = new List<RelayServerConfig>
         {
             new RelayServerConfig { Name = "Vultr (Atlanta)", Address = "96.30.192.184", Port = 9015 }, // Vultr (Atlanta)
@@ -314,23 +314,6 @@ namespace JohnRelayMod
             new RelayServerConfig { Name = "OVH (Los Angeles)", Address = "40.160.254.25", Port = 9015 },  // OVH (Los Angeles)
             new RelayServerConfig { Name = "OVH (New York)", Address = "40.160.231.161", Port = 9015 },  // OVH (New York)
             new RelayServerConfig { Name = "OVH (Virginia)", Address = "15.204.223.103", Port = 9015 }  // OVH (Virginia)
-        };
-
-        // PHL Pickup 6
-        public static List<RelayServerConfig> Relays_PHLPickup6 = new List<RelayServerConfig>
-        {
-            new RelayServerConfig { Name = "Vultr (Atlanta)", Address = "96.30.192.184", Port = 9016 }, // Vultr (Atlanta)
-            new RelayServerConfig { Name = "Vultr (Chicago)", Address = "149.28.119.78", Port = 9016 },  // Vultr (Chicago)
-            new RelayServerConfig { Name = "Vultr (Dallas)", Address = "149.28.247.103", Port = 9016 },  // Vultr (Dallas)
-            new RelayServerConfig { Name = "Clouvider (Chicago)", Address = "193.239.237.14", Port = 9016 },  // Clouvider (Chicago)
-            new RelayServerConfig { Name = "Clouvider (Los Angeles)", Address = "45.149.172.59", Port = 9016 },  // Clouvider (Los Angeles)
-            new RelayServerConfig { Name = "Clouvider (Virginia)", Address = "77.247.127.41", Port = 9016 },  // Clouvider (Virginia)
-            new RelayServerConfig { Name = "Linode (Chicago)", Address = "172.239.36.57", Port = 9016 }, // Linode (Chicago)
-            new RelayServerConfig { Name = "Linode (Seattle)", Address = "172.232.175.173", Port = 9016 }, // Linode (Seattle)
-            new RelayServerConfig { Name = "Linode (Toronto)", Address = "172.105.17.42", Port = 9016 }, // Linode (Toronto)
-            new RelayServerConfig { Name = "OVH (Los Angeles)", Address = "40.160.254.25", Port = 9016 },  // OVH (Los Angeles)
-            new RelayServerConfig { Name = "OVH (New York)", Address = "40.160.231.161", Port = 9016 },  // OVH (New York)
-            new RelayServerConfig { Name = "OVH (Virginia)", Address = "15.204.223.103", Port = 9016 }  // OVH (Virginia)
         };
 
         // Global fallback list of known relays (generic)
@@ -462,9 +445,8 @@ namespace JohnRelayMod
                 CreateAndRegisterServerEntry("149.28.115.65", 7777, Relays_PHLPickup1); // PHL Pickup 1
                 CreateAndRegisterServerEntry("149.28.115.65", 7779, Relays_PHLPickup2); // PHL Pickup 2
                 CreateAndRegisterServerEntry("149.28.115.65", 7781, Relays_PHLPickup3); // PHL Pickup 3
-                CreateAndRegisterServerEntry("66.42.126.148", 7777, Relays_PHLPickup4); // PHL Pickup 4
-                CreateAndRegisterServerEntry("66.42.126.148", 7779, Relays_PHLPickup5); // PHL Pickup 5
-                CreateAndRegisterServerEntry("66.42.126.148", 7781, Relays_PHLPickup6); // PHL Pickup 6
+                CreateAndRegisterServerEntry("104.207.141.244", 7777, Relays_PHLPickup4); // PHL Pickup 4 BETA
+                CreateAndRegisterServerEntry("104.207.141.244", 7779, Relays_PHLPickup5); // PHL Pickup 5 BETA
             }
             catch (Exception e)
             {
