@@ -201,10 +201,10 @@ namespace JohnRelayMod
                                                 pingLabel.style.unityTextAlign = TextAnchor.MiddleLeft;
                                                 try
                                                 {
-                                                    providerLabel.text = relay.Address ?? "";
-                                                    locationLabel.text = relay.Port.ToString();
+                                                    providerLabel.text = relay.Name ?? relay.Address ?? "";
+                                                    locationLabel.text = "";
                                                 }
-                                                catch { providerLabel.text = relay.Address ?? ""; locationLabel.text = relay.Port.ToString(); }
+                                                catch { providerLabel.text = relay.Name ?? relay.Address ?? ""; locationLabel.text = ""; }
                                                 row.Add(providerLabel);
                                                 row.Add(locationLabel);
                                                 row.Add(pingLabel);
@@ -330,6 +330,8 @@ namespace JohnRelayMod
             public int external_port;
         }
 
+        // NOTE: Production should use proper TLS with valid certificates.
+
         public static IEnumerator RegisterRelayAndSelect(RelayServerConfig relay, string serverIp, ushort serverPort, object popupMgr, string popupName)
         {
             if (relay == null || string.IsNullOrEmpty(relay.Address)) yield break;
@@ -338,12 +340,11 @@ namespace JohnRelayMod
             string apiPath = RelayRouterHelpers.RelayRegisterPath ?? "/register";
             string body = "{\"target_ip\":\"" + serverIp + "\",\"target_port\":" + serverPort + "}";
 
-            string httpsUrl = string.Format("https://{0}:{1}{2}", relay.Address, apiPort, apiPath);
-            string httpUrl = string.Format("http://{0}:{1}{2}", relay.Address, apiPort, apiPath);
-
+            // Use `Domain` for API requests if provided, otherwise fall back to the relay Address.
+            var requestHost = !string.IsNullOrEmpty(relay.Domain) ? relay.Domain : relay.Address;
+            string httpsUrl = string.Format("https://{0}:{1}{2}", requestHost, apiPort, apiPath);
             string respText = null;
 
-            // Attempt HTTPS first, then fall back to HTTP if HTTPS fails.
             UnityWebRequest uwr = null;
             try
             {
@@ -378,51 +379,8 @@ namespace JohnRelayMod
                 else
                 {
                     Debug.Log(string.Format("[RelaySelectionUI] HTTPS register attempt failed ({0}): {1}", relay.Address, uwr.error));
-                }
-            }
-
-            if (string.IsNullOrEmpty(respText))
-            {
-                // Try HTTP fallback. This may be blocked by Unity Player Settings (non-secure connections disabled).
-                UnityWebRequest uwr2 = null;
-                try
-                {
-                    uwr2 = new UnityWebRequest(httpUrl, "POST");
-                    byte[] bodyRaw2 = Encoding.UTF8.GetBytes(body);
-                    uwr2.uploadHandler = new UploadHandlerRaw(bodyRaw2);
-                    uwr2.downloadHandler = new DownloadHandlerBuffer();
-                    uwr2.SetRequestHeader("Content-Type", "application/json");
-                    uwr2.SetRequestHeader("X-Relay-Token", RelayRouterHelpers.RelayApiToken ?? "changeme");
-                    uwr2.timeout = 10;
-                }
-                catch (InvalidOperationException ioe)
-                {
-                    Debug.Log(string.Format("[RelaySelectionUI] HTTP attempt blocked during setup (insecure connections disabled): {0}", ioe.Message));
-                    Debug.Log("[RelaySelectionUI] Enable non-secure HTTP in Player Settings or configure your relay with HTTPS.");
                     yield break;
                 }
-
-                if (uwr2 == null)
-                {
-                    yield break;
-                }
-
-                yield return uwr2.SendWebRequest();
-
-                bool error2 = false;
-#if UNITY_2020_1_OR_NEWER
-                error2 = uwr2.result == UnityWebRequest.Result.ConnectionError || uwr2.result == UnityWebRequest.Result.ProtocolError;
-#else
-                error2 = uwr2.isNetworkError || uwr2.isHttpError;
-#endif
-                if (error2)
-                {
-                    Debug.Log(string.Format("[RelaySelectionUI] HTTP register attempt failed ({0}): {1}", relay.Address, uwr2.error));
-                    Debug.Log("[RelaySelectionUI] If you see 'Insecure connection not allowed', enable non-secure HTTP in Player Settings or use an HTTPS-enabled relay.");
-                    yield break;
-                }
-
-                respText = uwr2.downloadHandler != null ? uwr2.downloadHandler.text : null;
             }
             if (string.IsNullOrEmpty(respText))
             {
@@ -438,7 +396,7 @@ namespace JohnRelayMod
                     RelayRouterHelpers.SetSelectedRelay(relay.Address, (ushort)resp.external_port, relay.Address);
                     var hideMethod = popupMgr.GetType().GetMethod("HidePopup", BindingFlags.Public | BindingFlags.Instance);
                     hideMethod?.Invoke(popupMgr, new object[] { popupName });
-                    Debug.Log(string.Format("[RelaySelectionUI] Relay registered and selected: {0}:{1}", relay.Address, resp.external_port));
+                    Debug.Log(string.Format("[RelaySelectionUI] Relay registered and selected: {0} (api host: {1}) -> external:{2}", relay.Address, requestHost, resp.external_port));
                     yield break;
                 }
                 else
@@ -625,10 +583,10 @@ namespace JohnRelayMod
                                                 pingLabel.style.unityTextAlign = TextAnchor.MiddleLeft;
                                                 try
                                                 {
-                                                    providerLabel.text = relay.Address ?? "";
-                                                    locationLabel.text = relay.Port.ToString();
+                                                      providerLabel.text = relay.Name ?? relay.Address ?? "";
+                                                      locationLabel.text = "";
                                                 }
-                                                catch { providerLabel.text = relay.Address ?? ""; locationLabel.text = relay.Port.ToString(); }
+                                                   catch { providerLabel.text = relay.Name ?? relay.Address ?? ""; locationLabel.text = ""; }
                                                 row.Add(providerLabel);
                                                 row.Add(locationLabel);
                                                 row.Add(pingLabel);

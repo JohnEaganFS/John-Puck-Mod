@@ -82,11 +82,12 @@ namespace JohnRelayMod
         // Populate this list at runtime (or edit before build) to expose relays in the UI.
         public static List<RelayServerConfig> ConfiguredRelays = new List<RelayServerConfig>
         {
-            new RelayServerConfig { Name = "Clouvider (Chicago)", Address = "193.239.237.193", Port = 9000 }
+            // Keep the actual connection IP in `Address`, and provide the domain for HTTPS requests.
+            new RelayServerConfig { Name = "Clouvider (Chicago)", Address = "193.239.237.193", Domain = "clouvider-chi.puck-relay.com", Port = 443 }
         };
 
         // Relay API defaults used by RelaySelectionUI when registering a mapping
-        public static int RelayApiPort = 9000;
+        public static int RelayApiPort = 443;
         public static string RelayApiToken = "changeme";
         public static string RelayRegisterPath = "/register";
 
@@ -292,6 +293,8 @@ namespace JohnRelayMod
     {
         public string Name;
         public string Address;
+        // Optional domain/hostname to use for API requests (separate from the actual connect IP)
+        public string Domain;
         public ushort Port;
     }
 
