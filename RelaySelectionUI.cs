@@ -128,16 +128,12 @@ namespace JohnRelayMod
                                     headerRow.style.flexDirection = FlexDirection.Row;
                                     headerRow.style.alignItems = Align.Center;
                                     var hProv = new Label("Provider");
-                                    hProv.style.width = 212;
+                                    hProv.style.width = 550;
                                     hProv.style.unityTextAlign = TextAnchor.MiddleLeft;
-                                    var hLoc = new Label("Location");
-                                    hLoc.style.width = 280;
-                                    hLoc.style.unityTextAlign = TextAnchor.MiddleLeft;
                                     var hPing = new Label("Ping to Relay");
                                     hPing.style.width = 250;
                                     hPing.style.unityTextAlign = TextAnchor.MiddleLeft;
                                     headerRow.Add(hProv);
-                                    headerRow.Add(hLoc);
                                     headerRow.Add(hPing);
                                     contentContainer.Add(headerRow);
 
@@ -189,24 +185,18 @@ namespace JohnRelayMod
                                                 row.style.flexDirection = FlexDirection.Row;
                                                 row.style.alignItems = Align.Center;
                                                 var providerLabel = new Label("");
-                                                providerLabel.style.width = 200;
+                                                providerLabel.style.width = 600;
                                                 providerLabel.style.unityTextAlign = TextAnchor.MiddleLeft;
                                                 providerLabel.text = "";
-                                                var locationLabel = new Label("");
-                                                locationLabel.style.width = 320;
-                                                locationLabel.style.unityTextAlign = TextAnchor.MiddleLeft;
-                                                locationLabel.text = "";
                                                 var pingLabel = new Label("...");
-                                                pingLabel.style.width = 150;
+                                                pingLabel.style.width = 250;
                                                 pingLabel.style.unityTextAlign = TextAnchor.MiddleLeft;
                                                 try
                                                 {
                                                     providerLabel.text = relay.Name ?? relay.Address ?? "";
-                                                    locationLabel.text = "";
                                                 }
-                                                catch { providerLabel.text = relay.Name ?? relay.Address ?? ""; locationLabel.text = ""; }
+                                                catch { providerLabel.text = relay.Name ?? relay.Address ?? ""; }
                                                 row.Add(providerLabel);
-                                                row.Add(locationLabel);
                                                 row.Add(pingLabel);
                                                 btn.Add(row);
                                                 btn.RegisterCallback<MouseEnterEvent>((evt) =>
@@ -513,16 +503,12 @@ namespace JohnRelayMod
                                                 headerRow.style.flexDirection = FlexDirection.Row;
                                                 headerRow.style.alignItems = Align.Center;
                                                 var hProv = new Label("Provider");
-                                                hProv.style.width = 212;
+                                                hProv.style.width = 550;
                                                 hProv.style.unityTextAlign = TextAnchor.MiddleLeft;
-                                                var hLoc = new Label("Location");
-                                                hLoc.style.width = 280;
-                                                hLoc.style.unityTextAlign = TextAnchor.MiddleLeft;
                                                 var hPing = new Label("Ping to Relay");
                                                 hPing.style.width = 250;
                                                 hPing.style.unityTextAlign = TextAnchor.MiddleLeft;
                                                 headerRow.Add(hProv);
-                                                headerRow.Add(hLoc);
                                                 headerRow.Add(hPing);
                                                 contentContainer.Add(headerRow);
 
@@ -571,24 +557,18 @@ namespace JohnRelayMod
                                                 row.style.flexDirection = FlexDirection.Row;
                                                 row.style.alignItems = Align.Center;
                                                 var providerLabel = new Label("");
-                                                providerLabel.style.width = 200;
+                                                providerLabel.style.width = 600;
                                                 providerLabel.style.unityTextAlign = TextAnchor.MiddleLeft;
                                                 providerLabel.text = "";
-                                                var locationLabel = new Label("");
-                                                locationLabel.style.width = 320;
-                                                locationLabel.style.unityTextAlign = TextAnchor.MiddleLeft;
-                                                locationLabel.text = "";
                                                 var pingLabel = new Label("...");
-                                                pingLabel.style.width = 150;
+                                                pingLabel.style.width = 250;
                                                 pingLabel.style.unityTextAlign = TextAnchor.MiddleLeft;
                                                 try
                                                 {
                                                       providerLabel.text = relay.Name ?? relay.Address ?? "";
-                                                      locationLabel.text = "";
                                                 }
-                                                   catch { providerLabel.text = relay.Name ?? relay.Address ?? ""; locationLabel.text = ""; }
+                                                   catch { providerLabel.text = relay.Name ?? relay.Address ?? ""; }
                                                 row.Add(providerLabel);
-                                                row.Add(locationLabel);
                                                 row.Add(pingLabel);
                                                 btn.Add(row);
                                                 btn.RegisterCallback<MouseEnterEvent>((evt) =>

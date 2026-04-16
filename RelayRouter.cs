@@ -83,7 +83,9 @@ namespace JohnRelayMod
         public static List<RelayServerConfig> ConfiguredRelays = new List<RelayServerConfig>
         {
             // Keep the actual connection IP in `Address`, and provide the domain for HTTPS requests.
-            new RelayServerConfig { Name = "Clouvider (Chicago)", Address = "193.239.237.193", Domain = "clouvider-chi.puck-relay.com", Port = 443 }
+            new RelayServerConfig { Name = "Clouvider (Chicago)", Address = "193.239.237.193", Domain = "clouvider-chi.puck-relay.com", Port = 443 },
+            new RelayServerConfig { Name = "Linode (Chicago)", Address = "172.237.130.110", Domain = "linode-chi.puck-relay.com", Port = 443 },
+            new RelayServerConfig { Name = "Vultr (Chicago)", Address = "173.199.93.101", Domain = "vultr-chi.puck-relay.com", Port = 443 }
         };
 
         // Relay API defaults used by RelaySelectionUI when registering a mapping
