@@ -5,6 +5,8 @@ using UnityEngine;
 using HarmonyLib;
 using UnityEngine.UIElements;
 using System.Reflection;
+using System.Text;
+using UnityEngine.Networking;
 
 namespace JohnRelayMod
 {
@@ -146,16 +148,24 @@ namespace JohnRelayMod
                                         {
                                             try
                                             {
-                                                RelayRouterHelpers.SetSelectedRelay(relay.Address, relay.Port, relay.Name);
-                                                var hideMethod = popupMgr.GetType().GetMethod("HidePopup", BindingFlags.Public | BindingFlags.Instance);
-                                                hideMethod?.Invoke(popupMgr, new object[] { popupName });
-                                                Debug.Log(string.Format("[RelaySelectionUI] Relay selected: {0}", relay.Name));
+                                                var evtMgr = MonoBehaviourSingleton<EventManager>.Instance;
+                                                if (evtMgr != null)
+                                                {
+                                                    evtMgr.StartCoroutine(RegisterRelayAndSelect(relay, ipAddress, port, popupMgr, popupName));
+                                                }
+                                                else
+                                                {
+                                                    RelayRouterHelpers.SetSelectedRelay(relay.Address, relay.Port, relay.Address);
+                                                    var hideMethod = popupMgr.GetType().GetMethod("HidePopup", BindingFlags.Public | BindingFlags.Instance);
+                                                    hideMethod?.Invoke(popupMgr, new object[] { popupName });
+                                                    Debug.Log(string.Format("[RelaySelectionUI] Relay selected (fallback): {0}:{1}", relay.Address, relay.Port));
+                                                }
                                             }
                                             catch (Exception exBtn)
                                             {
                                                 Debug.LogException(exBtn);
                                             }
-                                        }) { text = string.Format("{0}", relay.Name) };
+                                          }) { text = string.Format("{0}:{1}", relay.Address, relay.Port) };
                                         btn.style.marginBottom = 4;
                                         btn.style.borderTopWidth = 1;
                                         btn.style.borderBottomWidth = 1;
@@ -191,23 +201,10 @@ namespace JohnRelayMod
                                                 pingLabel.style.unityTextAlign = TextAnchor.MiddleLeft;
                                                 try
                                                 {
-                                                    string full = relay.Name as string ?? "";
-                                                    string a = full;
-                                                    string b = "";
-                                                    var parenIdx = full.LastIndexOf(" (", StringComparison.Ordinal);
-                                                    if (parenIdx > 0 && full.EndsWith(")"))
-                                                    {
-                                                        a = full.Substring(0, parenIdx).Trim();
-                                                        b = full.Substring(parenIdx + 2, full.Length - parenIdx - 3).Trim();
-                                                    }
-                                                    else if (full.Contains(" - ")) { var parts = full.Split(new string[]{" - "}, StringSplitOptions.None); a = parts[0]; b = parts.Length>1?parts[1]:""; }
-                                                    else if (full.Contains("|")) { var parts = full.Split('|'); a = parts[0].Trim(); b = parts.Length>1?parts[1].Trim():""; }
-                                                    else if (full.Contains(",")) { var parts = full.Split(','); a = parts[0].Trim(); b = parts.Length>1?parts[1].Trim():""; }
-                                                    else { var idx = full.LastIndexOf(' '); if (idx>0) { a = full.Substring(0, idx).Trim(); b = full.Substring(idx+1).Trim(); } }
-                                                    providerLabel.text = a;
-                                                    locationLabel.text = b;
+                                                    providerLabel.text = relay.Address ?? "";
+                                                    locationLabel.text = relay.Port.ToString();
                                                 }
-                                                catch { providerLabel.text = relay.Name as string ?? ""; }
+                                                catch { providerLabel.text = relay.Address ?? ""; locationLabel.text = relay.Port.ToString(); }
                                                 row.Add(providerLabel);
                                                 row.Add(locationLabel);
                                                 row.Add(pingLabel);
@@ -235,7 +232,7 @@ namespace JohnRelayMod
                                                     var evtMgr = MonoBehaviourSingleton<EventManager>.Instance;
                                                     if (evtMgr != null)
                                                     {
-                                                        evtMgr.StartCoroutine(PingAndUpdate(ipForPing, pingLabel, relay.Name as string));
+                                                        evtMgr.StartCoroutine(PingAndUpdate(ipForPing, pingLabel, relay.Address as string));
                                                     }
                                                 }
                                                 catch (Exception) { }
@@ -324,6 +321,134 @@ namespace JohnRelayMod
                     pingLabel.text = string.Format("(timeout)");
                 }
                 catch (Exception) { }
+            }
+        }
+
+        [Serializable]
+        class RegisterResponse
+        {
+            public int external_port;
+        }
+
+        public static IEnumerator RegisterRelayAndSelect(RelayServerConfig relay, string serverIp, ushort serverPort, object popupMgr, string popupName)
+        {
+            if (relay == null || string.IsNullOrEmpty(relay.Address)) yield break;
+
+            int apiPort = RelayRouterHelpers.RelayApiPort;
+            string apiPath = RelayRouterHelpers.RelayRegisterPath ?? "/register";
+            string body = "{\"target_ip\":\"" + serverIp + "\",\"target_port\":" + serverPort + "}";
+
+            string httpsUrl = string.Format("https://{0}:{1}{2}", relay.Address, apiPort, apiPath);
+            string httpUrl = string.Format("http://{0}:{1}{2}", relay.Address, apiPort, apiPath);
+
+            string respText = null;
+
+            // Attempt HTTPS first, then fall back to HTTP if HTTPS fails.
+            UnityWebRequest uwr = null;
+            try
+            {
+                uwr = new UnityWebRequest(httpsUrl, "POST");
+                byte[] bodyRaw = Encoding.UTF8.GetBytes(body);
+                uwr.uploadHandler = new UploadHandlerRaw(bodyRaw);
+                uwr.downloadHandler = new DownloadHandlerBuffer();
+                uwr.SetRequestHeader("Content-Type", "application/json");
+                uwr.SetRequestHeader("X-Relay-Token", RelayRouterHelpers.RelayApiToken ?? "changeme");
+                uwr.timeout = 10;
+            }
+            catch (InvalidOperationException ioe)
+            {
+                Debug.Log(string.Format("[RelaySelectionUI] HTTPS attempt threw during setup: {0}", ioe.Message));
+                uwr = null;
+            }
+
+            if (uwr != null)
+            {
+                yield return uwr.SendWebRequest();
+
+                bool error = false;
+#if UNITY_2020_1_OR_NEWER
+                error = uwr.result == UnityWebRequest.Result.ConnectionError || uwr.result == UnityWebRequest.Result.ProtocolError;
+#else
+                error = uwr.isNetworkError || uwr.isHttpError;
+#endif
+                if (!error)
+                {
+                    respText = uwr.downloadHandler != null ? uwr.downloadHandler.text : null;
+                }
+                else
+                {
+                    Debug.Log(string.Format("[RelaySelectionUI] HTTPS register attempt failed ({0}): {1}", relay.Address, uwr.error));
+                }
+            }
+
+            if (string.IsNullOrEmpty(respText))
+            {
+                // Try HTTP fallback. This may be blocked by Unity Player Settings (non-secure connections disabled).
+                UnityWebRequest uwr2 = null;
+                try
+                {
+                    uwr2 = new UnityWebRequest(httpUrl, "POST");
+                    byte[] bodyRaw2 = Encoding.UTF8.GetBytes(body);
+                    uwr2.uploadHandler = new UploadHandlerRaw(bodyRaw2);
+                    uwr2.downloadHandler = new DownloadHandlerBuffer();
+                    uwr2.SetRequestHeader("Content-Type", "application/json");
+                    uwr2.SetRequestHeader("X-Relay-Token", RelayRouterHelpers.RelayApiToken ?? "changeme");
+                    uwr2.timeout = 10;
+                }
+                catch (InvalidOperationException ioe)
+                {
+                    Debug.Log(string.Format("[RelaySelectionUI] HTTP attempt blocked during setup (insecure connections disabled): {0}", ioe.Message));
+                    Debug.Log("[RelaySelectionUI] Enable non-secure HTTP in Player Settings or configure your relay with HTTPS.");
+                    yield break;
+                }
+
+                if (uwr2 == null)
+                {
+                    yield break;
+                }
+
+                yield return uwr2.SendWebRequest();
+
+                bool error2 = false;
+#if UNITY_2020_1_OR_NEWER
+                error2 = uwr2.result == UnityWebRequest.Result.ConnectionError || uwr2.result == UnityWebRequest.Result.ProtocolError;
+#else
+                error2 = uwr2.isNetworkError || uwr2.isHttpError;
+#endif
+                if (error2)
+                {
+                    Debug.Log(string.Format("[RelaySelectionUI] HTTP register attempt failed ({0}): {1}", relay.Address, uwr2.error));
+                    Debug.Log("[RelaySelectionUI] If you see 'Insecure connection not allowed', enable non-secure HTTP in Player Settings or use an HTTPS-enabled relay.");
+                    yield break;
+                }
+
+                respText = uwr2.downloadHandler != null ? uwr2.downloadHandler.text : null;
+            }
+            if (string.IsNullOrEmpty(respText))
+            {
+                Debug.Log(string.Format("[RelaySelectionUI] Empty register response from {0}", relay.Address));
+                yield break;
+            }
+
+            try
+            {
+                var resp = JsonUtility.FromJson<RegisterResponse>(respText);
+                if (resp != null && resp.external_port > 0)
+                {
+                    RelayRouterHelpers.SetSelectedRelay(relay.Address, (ushort)resp.external_port, relay.Address);
+                    var hideMethod = popupMgr.GetType().GetMethod("HidePopup", BindingFlags.Public | BindingFlags.Instance);
+                    hideMethod?.Invoke(popupMgr, new object[] { popupName });
+                    Debug.Log(string.Format("[RelaySelectionUI] Relay registered and selected: {0}:{1}", relay.Address, resp.external_port));
+                    yield break;
+                }
+                else
+                {
+                    Debug.Log(string.Format("[RelaySelectionUI] Register response missing external_port: {0}", respText));
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.LogException(e);
             }
         }
 
@@ -450,18 +575,24 @@ namespace JohnRelayMod
                                                 {
                                                     try
                                                     {
-                                                        // set the selected relay so the connection will be redirected
-                                                        RelayRouterHelpers.SetSelectedRelay(relay.Address, relay.Port, relay.Name);
-                                                        // hide the popup to allow the onHide handler to resume the connection
-                                                        var hideMethod = popupMgr.GetType().GetMethod("HidePopup", BindingFlags.Public | BindingFlags.Instance);
-                                                        hideMethod?.Invoke(popupMgr, new object[] { popupName });
-                                                        Debug.Log(string.Format("[RelaySelectionUI] Relay selected and popup hidden: {0} {1}:{2}", relay.Name, relay.Address, relay.Port));
+                                                        var evtMgr = MonoBehaviourSingleton<EventManager>.Instance;
+                                                        if (evtMgr != null)
+                                                        {
+                                                            evtMgr.StartCoroutine(RelaySelectionUI.RegisterRelayAndSelect(relay, serverObj.ipAddress, serverObj.port, popupMgr, popupName));
+                                                        }
+                                                        else
+                                                        {
+                                                            RelayRouterHelpers.SetSelectedRelay(relay.Address, relay.Port, relay.Address);
+                                                            var hideMethod = popupMgr.GetType().GetMethod("HidePopup", BindingFlags.Public | BindingFlags.Instance);
+                                                            hideMethod?.Invoke(popupMgr, new object[] { popupName });
+                                                            Debug.Log(string.Format("[RelaySelectionUI] Relay selected (fallback) and popup hidden: {0} {1}:{2}", relay.Address, relay.Address, relay.Port));
+                                                        }
                                                     }
                                                     catch (Exception exBtn)
                                                     {
                                                         Debug.LogException(exBtn);
                                                     }
-                                                }) { text = string.Format("{0}", relay.Name) };
+                                                }) { text = string.Format("{0}:{1}", relay.Address, relay.Port) };
                                                 btn.style.marginBottom = 4;
                                                 // make button look like an outlined option
                                                 btn.style.borderTopWidth = 1;
@@ -494,23 +625,10 @@ namespace JohnRelayMod
                                                 pingLabel.style.unityTextAlign = TextAnchor.MiddleLeft;
                                                 try
                                                 {
-                                                    string full = relay.Name as string ?? "";
-                                                    string a = full;
-                                                    string b = "";
-                                                    var parenIdx = full.LastIndexOf(" (", StringComparison.Ordinal);
-                                                    if (parenIdx > 0 && full.EndsWith(")"))
-                                                    {
-                                                        a = full.Substring(0, parenIdx).Trim();
-                                                        b = full.Substring(parenIdx + 2, full.Length - parenIdx - 3).Trim();
-                                                    }
-                                                    else if (full.Contains(" - ")) { var parts = full.Split(new string[]{" - "}, StringSplitOptions.None); a = parts[0]; b = parts.Length>1?parts[1]:""; }
-                                                    else if (full.Contains("|")) { var parts = full.Split('|'); a = parts[0].Trim(); b = parts.Length>1?parts[1].Trim():""; }
-                                                    else if (full.Contains(",")) { var parts = full.Split(','); a = parts[0].Trim(); b = parts.Length>1?parts[1].Trim():""; }
-                                                    else { var idx = full.LastIndexOf(' '); if (idx>0) { a = full.Substring(0, idx).Trim(); b = full.Substring(idx+1).Trim(); } }
-                                                    providerLabel.text = a;
-                                                    locationLabel.text = b;
+                                                    providerLabel.text = relay.Address ?? "";
+                                                    locationLabel.text = relay.Port.ToString();
                                                 }
-                                                catch { providerLabel.text = relay.Name as string ?? ""; }
+                                                catch { providerLabel.text = relay.Address ?? ""; locationLabel.text = relay.Port.ToString(); }
                                                 row.Add(providerLabel);
                                                 row.Add(locationLabel);
                                                 row.Add(pingLabel);
@@ -538,7 +656,7 @@ namespace JohnRelayMod
                                                     var evtMgr = MonoBehaviourSingleton<EventManager>.Instance;
                                                     if (evtMgr != null)
                                                     {
-                                                        evtMgr.StartCoroutine(RelaySelectionUI.PingAndUpdate(ipForPing, pingLabel, relay.Name as string));
+                                                        evtMgr.StartCoroutine(RelaySelectionUI.PingAndUpdate(ipForPing, pingLabel, relay.Address as string));
                                                     }
                                                 }
                                                 catch (Exception) { }
