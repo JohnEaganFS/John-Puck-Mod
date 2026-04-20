@@ -335,6 +335,9 @@ namespace JohnRelayMod
             string httpsUrl = string.Format("https://{0}:{1}{2}", requestHost, apiPort, apiPath);
             string respText = null;
 
+            // Log httpsURL being requested for easier debugging of connectivity issues
+            Debug.Log(string.Format("[RelaySelectionUI] Attempting to register relay via HTTPS request to: {0}", httpsUrl));
+
             UnityWebRequest uwr = null;
             try
             {
