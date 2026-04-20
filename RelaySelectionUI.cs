@@ -338,6 +338,14 @@ namespace JohnRelayMod
             // Log httpsURL being requested for easier debugging of connectivity issues
             Debug.Log(string.Format("[RelaySelectionUI] Attempting to register relay via HTTPS request to: {0}", httpsUrl));
 
+            // Log body of the request for debugging purposes, but redact any sensitive tokens
+            string logBody = body;
+            if (logBody.Contains("X-Relay-Token"))
+            {
+                logBody = logBody.Replace(RelayRouterHelpers.RelayApiToken ?? "changeme", "REDACTED");
+            }
+            Debug.Log(string.Format("[RelaySelectionUI] HTTPS request body: {0}", logBody));
+
             UnityWebRequest uwr = null;
             try
             {
