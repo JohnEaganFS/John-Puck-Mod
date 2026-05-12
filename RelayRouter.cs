@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using HarmonyLib;
@@ -6,7 +7,7 @@ using HarmonyLib;
 namespace JohnRelayMod
 {
     // Minimal mod entry implementing IPuckMod. Initializes Harmony patches on enable.
-    public class RelayRouterMod : IPuckMod
+    public class RelayRouterMod : IPuckPlugin
     {
         public bool OnEnable()
         {
@@ -286,6 +287,37 @@ namespace JohnRelayMod
             catch (Exception e)
             {
                 Debug.LogException(e);
+            }
+        }
+
+        public static Coroutine StartCoroutine(IEnumerator routine)
+        {
+            try
+            {
+                if (routine == null) return null;
+
+                MonoBehaviour host = null;
+                if (UIManager.Instance != null)
+                {
+                    host = UIManager.Instance;
+                }
+                else if (ConnectionManager.Instance != null)
+                {
+                    host = ConnectionManager.Instance;
+                }
+
+                if (host == null)
+                {
+                    Debug.Log("[RelayRouterHelpers] No MonoBehaviour host available for coroutine.");
+                    return null;
+                }
+
+                return host.StartCoroutine(routine);
+            }
+            catch (Exception e)
+            {
+                Debug.LogException(e);
+                return null;
             }
         }
     }

@@ -20,10 +20,10 @@ public class InServerRelaySelectionRunner : MonoBehaviour
             var root = uiMgr.RootVisualElement;
             if (root == null) return;
 
-            var container = root.Q("PauseMenuContainer");
+            var container = root.Q("PauseMenu");
             if (container == null)
             {
-                Debug.Log("[InServerRelaySelectionRunner] PauseMenuContainer not found yet.");
+                Debug.Log("[InServerRelaySelectionRunner] PauseMenu not found yet.");
                 return;
             }
 

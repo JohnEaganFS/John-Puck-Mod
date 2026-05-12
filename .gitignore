@@ -1,6 +1,9 @@
 /bin
 /libs_client
 /libs_server
+/libs_202
+/libs_323
+/src
 /obj
 /og_src
 /RelayCommands.txt

@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Libs Include="libs_server\*.dll" Exclude="libs_server\System.*.dll" />
+    <Libs Include="libs_323\*.dll" Exclude="libs_323\System.*.dll" />
 
     <Reference Include="@(Libs)">
       <HintPath>%(Libs.FullPath)</HintPath>
@@ -13,10 +13,14 @@
     </Reference>
   </ItemGroup>
 
-  <!-- Exclude legacy/backup source files under og_src from compilation. Keep them as None so they remain visible in IDE. -->
+  <!-- Exclude decompiled game source from compilation. Keep it as None so it remains visible in IDE. -->
   <ItemGroup>
     <Compile Remove="og_src\**\*.cs" />
+    <Compile Remove="src\**\*.cs" />
+    <Compile Remove="libs_202\**\*.cs" />
     <None Include="og_src\**\*.cs" />
+    <None Include="src\**\*.cs" />
+    <None Include="libs_202\**\*.cs" />
   </ItemGroup>
 
   <!-- Exclude helper / scratch files under SS from compilation -->

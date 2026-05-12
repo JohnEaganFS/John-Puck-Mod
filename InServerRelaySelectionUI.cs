@@ -1,17 +1,13 @@
 using System;
-using UnityEngine;
-using HarmonyLib;
-using System.Linq;
 using System.Collections.Generic;
+using HarmonyLib;
+using UnityEngine;
 using UnityEngine.UIElements;
-using System.Reflection;
 
 namespace JohnRelayMod
 {
-    // In-server relay selection UI: minimal init/shutdown hooks.
     public static class InServerRelaySelectionUI
     {
-        // GameObject used for runtime checks/injection fallback
         static GameObject _runnerObject;
 
         public static void Init()
@@ -32,8 +28,6 @@ namespace JohnRelayMod
             }
         }
 
-        
-
         public static void Shutdown()
         {
             try
@@ -51,19 +45,16 @@ namespace JohnRelayMod
             }
         }
 
-        // Show the relay selection popup for the currently connected/last-connected server
         public static void ShowRelaySelectionForCurrentServer()
         {
             try
             {
-                var connMgr = ConnectionManager.Instance;
-                if (connMgr == null)
+                if (ConnectionManager.Instance == null)
                 {
                     Debug.Log("[InServerRelaySelectionUI] ConnectionManager not available.");
                     return;
                 }
 
-                // Always prefer the tracked client last target for determining the original server
                 string targetIp = RelayRouterHelpers.ClientLastTargetAddress;
                 ushort targetPort = RelayRouterHelpers.ClientLastTargetPort;
                 if (string.IsNullOrEmpty(targetIp))
@@ -72,8 +63,7 @@ namespace JohnRelayMod
                     return;
                 }
 
-                // Delegate to the shared RelaySelectionUI popup helper
-                RelaySelectionUI.ShowRelaySelectionForServer(targetIp, targetPort);
+                RelaySelectionUI.ShowRelaySelectionForServer(targetIp, targetPort, null);
             }
             catch (Exception e)
             {
@@ -82,27 +72,25 @@ namespace JohnRelayMod
         }
     }
 
-    // Patch server-side chat commands and log when a client issues /relay
-    [HarmonyPatch(typeof(UIChatController), "Event_Server_OnChatCommand")]
-    static class InServerRelay_UIChatController_ChatCmd_Patch
+    [HarmonyPatch(typeof(ChatManagerController), "Event_Server_OnChatCommand")]
+    static class InServerRelay_ChatManagerController_ChatCmd_Patch
     {
-        static void Postfix(UIChatController __instance, Dictionary<string, object> message)
+        static void Postfix(ChatManagerController __instance, Dictionary<string, object> message)
         {
             try
             {
-                if (message == null) return;
-                if (!message.ContainsKey("command")) return;
+                if (message == null || !message.ContainsKey("command")) return;
                 var command = message["command"] as string;
-                if (string.Equals(command, "/relay", StringComparison.OrdinalIgnoreCase))
+                if (!string.Equals(command, "/relay", StringComparison.OrdinalIgnoreCase)) return;
+
+                ulong clientId = 0UL;
+                if (message.ContainsKey("clientId"))
                 {
-                    ulong clientId = 0UL;
-                    if (message.ContainsKey("clientId"))
-                    {
-                        clientId = (ulong)message["clientId"];
-                    }
-                    Debug.Log(string.Format("[InServerRelaySelectionUI] Received /relay from client {0}", clientId));
-                    InServerRelaySelectionUI.ShowRelaySelectionForCurrentServer();
+                    clientId = (ulong)message["clientId"];
                 }
+
+                Debug.Log(string.Format("[InServerRelaySelectionUI] Received /relay from client {0}", clientId));
+                InServerRelaySelectionUI.ShowRelaySelectionForCurrentServer();
             }
             catch (Exception e)
             {
@@ -111,31 +99,30 @@ namespace JohnRelayMod
         }
     }
 
-    // Intercept the client-side send method so typing /relay doesn't send to server
-    [HarmonyPatch(typeof(UIChat), "Client_SendClientChatMessage")]
-    static class UIChat_Client_SendClientChatMessage_Patch
+    [HarmonyPatch(typeof(ChatManagerController), "Event_OnChatSubmitMessage")]
+    static class ChatManagerController_Event_OnChatSubmitMessage_Patch
     {
-        static bool Prefix(UIChat __instance, ref string message, bool useTeamChat)
+        static bool Prefix(ChatManagerController __instance, Dictionary<string, object> message)
         {
             try
             {
-                if (string.IsNullOrEmpty(message)) return true;
-                if (string.Equals(message.Trim(), "/relay", StringComparison.OrdinalIgnoreCase))
-                {
-                    Debug.Log("[InServerRelaySelectionUI] Intercepted /relay locally — opening relay UI and preventing send.");
-                    InServerRelaySelectionUI.ShowRelaySelectionForCurrentServer();
-                    return false; // prevent original method from sending the chat
-                }
+                if (message == null || !message.ContainsKey("content")) return true;
+                var content = message["content"] as string;
+                if (string.IsNullOrEmpty(content)) return true;
+                if (!string.Equals(content.Trim(), "/relay", StringComparison.OrdinalIgnoreCase)) return true;
+
+                Debug.Log("[InServerRelaySelectionUI] Intercepted /relay locally; opening relay UI and preventing send.");
+                InServerRelaySelectionUI.ShowRelaySelectionForCurrentServer();
+                return false;
             }
             catch (Exception e)
             {
                 Debug.LogException(e);
+                return true;
             }
-            return true;
         }
     }
 
-    // Inject a Relay Selection button into the pause menu using the Initialize's rootVisualElement
     [HarmonyPatch(typeof(UIPauseMenu), "Initialize")]
     static class UIPauseMenu_Initialize_Patch
     {
@@ -144,10 +131,9 @@ namespace JohnRelayMod
             try
             {
                 if (rootVisualElement == null) return;
-                var container = rootVisualElement.Q("PauseMenuContainer");
+                var container = rootVisualElement.Q("PauseMenu");
                 if (container == null) return;
 
-                // avoid duplicate by a fixed element name
                 var existing = container.Q<Button>("RelaySelectionButton");
                 if (existing != null) return;
 
@@ -170,7 +156,6 @@ namespace JohnRelayMod
                 relayBtn.style.paddingTop = 2;
                 relayBtn.style.paddingBottom = 2;
 
-                // add the relay button to the pause menu
                 container.Add(relayBtn);
                 Debug.Log("[InServerRelaySelectionUI] Injected Relay Selection button into pause menu via Initialize postfix.");
             }
