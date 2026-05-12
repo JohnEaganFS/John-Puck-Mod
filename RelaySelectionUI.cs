@@ -11,6 +11,8 @@ namespace JohnRelayMod
 {
     public static class RelaySelectionUI
     {
+        private static readonly Dictionary<string, bool> PopupShouldConnect = new Dictionary<string, bool>();
+
         public static void Init()
         {
             try
@@ -60,6 +62,7 @@ namespace JohnRelayMod
                 {
                     popupMgr.HidePopup(popupName);
                 }
+                PopupShouldConnect[popupName] = false;
 
                 var content = popupMgr.CreateNotificationContent("Select a relay.");
                 popupMgr.ShowPopup(popupName, "RELAY OPTIONS", content, false, true, null);
@@ -95,6 +98,7 @@ namespace JohnRelayMod
                 try
                 {
                     RelayRouterHelpers.ClearSelectedRelay();
+                    PopupShouldConnect[popupName] = true;
                     popupMgr.HidePopup(popupName);
                     Debug.Log("[RelaySelectionUI] Selected direct connection.");
                 }
@@ -209,6 +213,14 @@ namespace JohnRelayMod
                     if (name != popupName) return;
 
                     EventManager.RemoveEventListener("Event_OnPopupHide", onHide);
+                    bool shouldConnect = PopupShouldConnect.ContainsKey(popupName) && PopupShouldConnect[popupName];
+                    PopupShouldConnect.Remove(popupName);
+                    if (!shouldConnect)
+                    {
+                        Debug.Log(string.Format("[RelaySelectionUI] Relay selection popup {0} closed without selection; not connecting.", popupName));
+                        return;
+                    }
+
                     ConnectionManager.Instance.Client_StartClient(ipAddress, port, password);
                 }
                 catch (Exception e)
@@ -311,8 +323,39 @@ namespace JohnRelayMod
                 }
 
                 RelayRouterHelpers.SetSelectedRelay(relay.Address, (ushort)response.external_port, relay.Name ?? relay.Address);
+                PopupShouldConnect[popupName] = true;
                 popupMgr.HidePopup(popupName);
                 Debug.Log(string.Format("[RelaySelectionUI] Relay registered and selected: {0} -> external:{1}", relay.Address, response.external_port));
+            }
+        }
+    }
+
+    [HarmonyPatch(typeof(UIServerBrowser), "OnClickServer")]
+    static class UIServerBrowser_OnClickServer_Patch
+    {
+        static bool Prefix(ClickEvent e, EndPoint endPoint)
+        {
+            try
+            {
+                if (endPoint == null)
+                {
+                    return true;
+                }
+
+                var entry = RelayRouterHelpers.FindServerEntry(endPoint.ipAddress, endPoint.port);
+                if (entry == null)
+                {
+                    return true;
+                }
+
+                Debug.Log(string.Format("[RelaySelectionUI] Intercepted server row click before game connect flow for {0}:{1}", endPoint.ipAddress, endPoint.port));
+                RelaySelectionUI.ShowRelaySelectionForServer(endPoint.ipAddress, endPoint.port, null);
+                return false;
+            }
+            catch (Exception ex)
+            {
+                Debug.LogException(ex);
+                return true;
             }
         }
     }
