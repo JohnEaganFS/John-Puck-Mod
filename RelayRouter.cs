@@ -290,6 +290,23 @@ namespace JohnRelayMod
             }
         }
 
+        public static bool IsConfiguredRelayAddress(string address)
+        {
+            if (string.IsNullOrEmpty(address) || ConfiguredRelays == null)
+            {
+                return false;
+            }
+
+            foreach (var relay in ConfiguredRelays)
+            {
+                if (relay == null) continue;
+                if (string.Equals(relay.Address, address, StringComparison.OrdinalIgnoreCase)) return true;
+                if (string.Equals(relay.Domain, address, StringComparison.OrdinalIgnoreCase)) return true;
+            }
+
+            return false;
+        }
+
         public static Coroutine StartCoroutine(IEnumerator routine)
         {
             try
@@ -356,6 +373,12 @@ namespace JohnRelayMod
             {
                 // Debug log original target
                 Debug.Log(string.Format("[RelayRouterMod] Original connection target: {0}:{1}", ipAddress, port));
+                if (RelayRouterHelpers.IsConfiguredRelayAddress(ipAddress))
+                {
+                    Debug.Log(string.Format("[RelayRouterMod] Target {0}:{1} is a configured relay endpoint; preserving ClientLastTarget as {2}:{3}", ipAddress, port, RelayRouterHelpers.ClientLastTargetAddress, RelayRouterHelpers.ClientLastTargetPort));
+                    return true;
+                }
+
                 // Only consider redirecting if the destination matches a registered original server
                 var serverEntry = RelayRouterHelpers.FindServerEntry(ipAddress, port);
                 if (serverEntry != null)
@@ -379,6 +402,46 @@ namespace JohnRelayMod
                 Debug.LogException(e);
             }
             // continue with original method
+            return true;
+        }
+    }
+
+    [HarmonyPatch(typeof(BackendUtils), "IsConnectedToMatchEndPoint")]
+    static class BackendUtils_IsConnectedToMatchEndPoint_Patch
+    {
+        static bool Prefix(ref bool __result)
+        {
+            try
+            {
+                var matchData = BackendManager.PlayerState.MatchData;
+                var matchEndPoint = matchData != null ? matchData.endPoint : null;
+                if (matchEndPoint == null)
+                {
+                    return true;
+                }
+
+                var connection = GlobalStateManager.ConnectionState.Connection;
+                var connectedEndPoint = connection != null ? connection.EndPoint : null;
+                if (connectedEndPoint == null)
+                {
+                    return true;
+                }
+
+                bool lastTargetMatchesMatch = string.Equals(RelayRouterHelpers.ClientLastTargetAddress, matchEndPoint.ipAddress, StringComparison.OrdinalIgnoreCase) &&
+                    RelayRouterHelpers.ClientLastTargetPort == matchEndPoint.port;
+                bool connectedThroughRelay = RelayRouterHelpers.IsConfiguredRelayAddress(connectedEndPoint.ipAddress);
+
+                if (lastTargetMatchesMatch && connectedThroughRelay)
+                {
+                    __result = true;
+                    return false;
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.LogException(e);
+            }
+
             return true;
         }
     }
