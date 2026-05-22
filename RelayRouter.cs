@@ -84,10 +84,10 @@ namespace JohnRelayMod
         public static List<RelayServerConfig> ConfiguredRelays = new List<RelayServerConfig>
         {
             // Keep the actual connection IP in `Address`, and provide the domain for HTTPS requests.
-            new RelayServerConfig { Name = "Clouvider (Chicago)", Address = "193.239.237.193", Domain = "clouvider-chi.puck-relay.com", Port = 443 },
-            new RelayServerConfig { Name = "Linode (Chicago)", Address = "172.237.130.110", Domain = "linode-chi.puck-relay.com", Port = 443 },
-            new RelayServerConfig { Name = "Vultr (Chicago)", Address = "173.199.93.101", Domain = "vultr-chi.puck-relay.com", Port = 443 },
-            new RelayServerConfig { Name = "Linode (Toronto)", Address = "172.105.17.42", Domain = "linode-tor.puck-relay.com", Port = 443 }
+            new RelayServerConfig { Name = "Clouvider (Chicago)", Address = "193.239.237.193", Domain = "clouvider-chi.puck-relay.com", AlternateDomain = "clouvider-chi-alt.puck-relay.com", Port = 443 },
+            new RelayServerConfig { Name = "Linode (Chicago)", Address = "172.237.130.110", Domain = "linode-chi.puck-relay.com", AlternateDomain = "linode-chi-alt.puck-relay.com", Port = 443 },
+            new RelayServerConfig { Name = "Vultr (Chicago)", Address = "173.199.93.101", Domain = "vultr-chi.puck-relay.com", AlternateDomain = "vultr-chi-alt.puck-relay.com", Port = 443 },
+            new RelayServerConfig { Name = "Linode (Toronto)", Address = "172.105.17.42", Domain = "linode-tor.puck-relay.com", AlternateDomain = "linode-tor-alt.puck-relay.com", Port = 443 }
         };
 
         // Relay API defaults used by RelaySelectionUI when registering a mapping
@@ -303,6 +303,7 @@ namespace JohnRelayMod
                 if (relay == null) continue;
                 if (string.Equals(relay.Address, address, StringComparison.OrdinalIgnoreCase)) return true;
                 if (string.Equals(relay.Domain, address, StringComparison.OrdinalIgnoreCase)) return true;
+                if (string.Equals(relay.AlternateDomain, address, StringComparison.OrdinalIgnoreCase)) return true;
             }
 
             return false;
@@ -347,6 +348,8 @@ namespace JohnRelayMod
         public string Address;
         // Optional domain/hostname to use for API requests (separate from the actual connect IP)
         public string Domain;
+        // Optional fallback hostname to use for API requests if Domain fails
+        public string AlternateDomain;
         public ushort Port;
     }
 

@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Libs Include="libs_323\*.dll" Exclude="libs_323\System.*.dll" />
+    <Libs Include="libs_897\*.dll" Exclude="libs_897\System.*.dll" />
 
     <Reference Include="@(Libs)">
       <HintPath>%(Libs.FullPath)</HintPath>
@@ -18,9 +18,11 @@
     <Compile Remove="og_src\**\*.cs" />
     <Compile Remove="src\**\*.cs" />
     <Compile Remove="libs_202\**\*.cs" />
+    <Compile Remove="puck_src\**\*.cs" />
     <None Include="og_src\**\*.cs" />
     <None Include="src\**\*.cs" />
     <None Include="libs_202\**\*.cs" />
+    <None Include="puck_src\**\*.cs" />
   </ItemGroup>
 
   <!-- Exclude helper / scratch files under SS from compilation -->

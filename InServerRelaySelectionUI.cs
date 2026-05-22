@@ -72,33 +72,6 @@ namespace JohnRelayMod
         }
     }
 
-    [HarmonyPatch(typeof(ChatManagerController), "Event_Server_OnChatCommand")]
-    static class InServerRelay_ChatManagerController_ChatCmd_Patch
-    {
-        static void Postfix(ChatManagerController __instance, Dictionary<string, object> message)
-        {
-            try
-            {
-                if (message == null || !message.ContainsKey("command")) return;
-                var command = message["command"] as string;
-                if (!string.Equals(command, "/relay", StringComparison.OrdinalIgnoreCase)) return;
-
-                ulong clientId = 0UL;
-                if (message.ContainsKey("clientId"))
-                {
-                    clientId = (ulong)message["clientId"];
-                }
-
-                Debug.Log(string.Format("[InServerRelaySelectionUI] Received /relay from client {0}", clientId));
-                InServerRelaySelectionUI.ShowRelaySelectionForCurrentServer();
-            }
-            catch (Exception e)
-            {
-                Debug.LogException(e);
-            }
-        }
-    }
-
     [HarmonyPatch(typeof(ChatManagerController), "Event_OnChatSubmitMessage")]
     static class ChatManagerController_Event_OnChatSubmitMessage_Patch
     {

@@ -265,6 +265,37 @@ namespace JohnRelayMod
             public int external_port = 0;
         }
 
+        private static List<string> GetRegisterHosts(RelayServerConfig relay)
+        {
+            var hosts = new List<string>();
+            if (relay == null)
+            {
+                return hosts;
+            }
+
+            AddUniqueHost(hosts, !string.IsNullOrEmpty(relay.Domain) ? relay.Domain : relay.Address);
+            AddUniqueHost(hosts, relay.AlternateDomain);
+            return hosts;
+        }
+
+        private static void AddUniqueHost(List<string> hosts, string host)
+        {
+            if (hosts == null || string.IsNullOrEmpty(host))
+            {
+                return;
+            }
+
+            foreach (var existing in hosts)
+            {
+                if (string.Equals(existing, host, StringComparison.OrdinalIgnoreCase))
+                {
+                    return;
+                }
+            }
+
+            hosts.Add(host);
+        }
+
         public static IEnumerator RegisterRelayAndSelect(RelayServerConfig relay, string serverIp, ushort serverPort, UIPopupManager popupMgr, string popupName)
         {
             if (relay == null || string.IsNullOrEmpty(relay.Address))
@@ -275,58 +306,71 @@ namespace JohnRelayMod
             int apiPort = RelayRouterHelpers.RelayApiPort;
             string apiPath = RelayRouterHelpers.RelayRegisterPath ?? "/register";
             string body = "{\"target_ip\":\"" + serverIp + "\",\"target_port\":" + serverPort + "}";
-            string requestHost = !string.IsNullOrEmpty(relay.Domain) ? relay.Domain : relay.Address;
-            string httpsUrl = string.Format("https://{0}:{1}{2}", requestHost, apiPort, apiPath);
-
-            Debug.Log(string.Format("[RelaySelectionUI] Registering relay via HTTPS request to: {0}", httpsUrl));
-            Debug.Log(string.Format("[RelaySelectionUI] Register request body: {0}", body));
-
-            using (var request = new UnityWebRequest(httpsUrl, "POST"))
+            var requestHosts = GetRegisterHosts(relay);
+            if (requestHosts.Count == 0)
             {
-                byte[] bodyRaw = Encoding.UTF8.GetBytes(body);
-                request.uploadHandler = new UploadHandlerRaw(bodyRaw);
-                request.downloadHandler = new DownloadHandlerBuffer();
-                request.SetRequestHeader("Content-Type", "application/json");
-                request.SetRequestHeader("X-Relay-Token", RelayRouterHelpers.RelayApiToken ?? "changeme");
-                request.timeout = 10;
-
-                yield return request.SendWebRequest();
-
-                bool error = request.result == UnityWebRequest.Result.ConnectionError || request.result == UnityWebRequest.Result.ProtocolError;
-                string responseText = request.downloadHandler != null ? request.downloadHandler.text : null;
-                if (error)
-                {
-                    Debug.Log(string.Format("[RelaySelectionUI] Relay register failed ({0}) status={1} error={2} response={3}", relay.Address, request.responseCode, request.error, responseText ?? ""));
-                    yield break;
-                }
-
-                if (string.IsNullOrEmpty(responseText))
-                {
-                    Debug.Log(string.Format("[RelaySelectionUI] Empty register response from {0}", relay.Address));
-                    yield break;
-                }
-
-                RegisterResponse response = null;
-                try
-                {
-                    response = JsonUtility.FromJson<RegisterResponse>(responseText);
-                }
-                catch (Exception e)
-                {
-                    Debug.LogException(e);
-                }
-
-                if (response == null || response.external_port <= 0)
-                {
-                    Debug.Log(string.Format("[RelaySelectionUI] Register response missing external_port: {0}", responseText));
-                    yield break;
-                }
-
-                RelayRouterHelpers.SetSelectedRelay(relay.Address, (ushort)response.external_port, relay.Name ?? relay.Address);
-                PopupShouldConnect[popupName] = true;
-                popupMgr.HidePopup(popupName);
-                Debug.Log(string.Format("[RelaySelectionUI] Relay registered and selected: {0} -> external:{1}", relay.Address, response.external_port));
+                Debug.Log(string.Format("[RelaySelectionUI] No register hosts available for relay {0}", relay.Name ?? relay.Address));
+                yield break;
             }
+
+            for (int i = 0; i < requestHosts.Count; i++)
+            {
+                string requestHost = requestHosts[i];
+                string httpsUrl = string.Format("https://{0}:{1}{2}", requestHost, apiPort, apiPath);
+
+                Debug.Log(string.Format("[RelaySelectionUI] Registering relay via HTTPS request to: {0}", httpsUrl));
+                Debug.Log(string.Format("[RelaySelectionUI] Register request body: {0}", body));
+
+                using (var request = new UnityWebRequest(httpsUrl, "POST"))
+                {
+                    byte[] bodyRaw = Encoding.UTF8.GetBytes(body);
+                    request.uploadHandler = new UploadHandlerRaw(bodyRaw);
+                    request.downloadHandler = new DownloadHandlerBuffer();
+                    request.SetRequestHeader("Content-Type", "application/json");
+                    request.SetRequestHeader("X-Relay-Token", RelayRouterHelpers.RelayApiToken ?? "changeme");
+                    request.timeout = 10;
+
+                    yield return request.SendWebRequest();
+
+                    bool error = request.result != UnityWebRequest.Result.Success;
+                    string responseText = request.downloadHandler != null ? request.downloadHandler.text : null;
+                    if (error)
+                    {
+                        Debug.Log(string.Format("[RelaySelectionUI] Relay register failed ({0} via {1}) status={2} error={3} response={4}", relay.Address, requestHost, request.responseCode, request.error, responseText ?? ""));
+                        continue;
+                    }
+
+                    if (string.IsNullOrEmpty(responseText))
+                    {
+                        Debug.Log(string.Format("[RelaySelectionUI] Empty register response from {0} via {1}", relay.Address, requestHost));
+                        continue;
+                    }
+
+                    RegisterResponse response = null;
+                    try
+                    {
+                        response = JsonUtility.FromJson<RegisterResponse>(responseText);
+                    }
+                    catch (Exception e)
+                    {
+                        Debug.LogException(e);
+                    }
+
+                    if (response == null || response.external_port <= 0)
+                    {
+                        Debug.Log(string.Format("[RelaySelectionUI] Register response missing external_port from {0} via {1}: {2}", relay.Address, requestHost, responseText));
+                        continue;
+                    }
+
+                    RelayRouterHelpers.SetSelectedRelay(relay.Address, (ushort)response.external_port, relay.Name ?? relay.Address);
+                    PopupShouldConnect[popupName] = true;
+                    popupMgr.HidePopup(popupName);
+                    Debug.Log(string.Format("[RelaySelectionUI] Relay registered and selected via {0}: {1} -> external:{2}", requestHost, relay.Address, response.external_port));
+                    yield break;
+                }
+            }
+
+            Debug.Log(string.Format("[RelaySelectionUI] Relay register failed for all hosts for {0}", relay.Name ?? relay.Address));
         }
     }
 
